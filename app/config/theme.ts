@@ -2,25 +2,37 @@
 
 export const fonts = {
     primary: 'Montserrat-SemiBold',
-    secondry: 'Montserrat-Medium',
+    // secondry: 'Montserrat-Medium',
     title: 'Montserrat-Black',
-    subTitle: 'Montserrat-ExtraBoldItalic',
-    dmSans: 'DM Sans',
-    textInput: "DMSans-Medium",
-    textFont: "DMSans-Regular",
+    subTitle: 'Montserrat-Light',
+    textInput: "Montserrat-Regular",
+    textFont: "Montserrat-Medium",
   };
   
   export const lightTheme = {
-    primary: '#064081',
-    secondry: '#02B0E8',
-    text: '#414042',
-   
+    primary :"#001219",
+    primaryLite : "#108bbc",
+    secondary : "#BB3E03",
+    highlight : "#94D2BD",
+    highlightLite : "#94d2bd2a",
+    highlightTranslucent : "#94d2bda9",
+    facebook:"#1877f2",
+    google:"#df4a32",
+    white:"#FFFFFF",
+    black:"#000000"
   };
   
   export const darkTheme = {
-    primary: '#064081',
-    secondry: '#02B0E8',
-    text: '#414042',
+    primary :"#001219",
+    primaryLite : "#108bbc",
+    secondary : "#BB3E03",
+    highlight : "#94D2BD",
+    highlightLite : "#94d2bd2a",
+    highlightTranslucent : "#94d2bda9",
+    facebook:"#1877f2",
+    google:"#df4a32",
+     white:"#FFFFFF",
+    black:"#000000"
    
   };
   

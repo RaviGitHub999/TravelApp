@@ -1,0 +1,22 @@
+{
+    "signUp":"SignUp",
+    "title1":"Username",
+    "title2":"Email",
+    "title3":"Password",
+    "iconComponentName1":"Ionicons",
+    "iconComponentName2":"Entypo",
+    "iconComponentName3":"FontAwesome5",
+    "iconComponentName4":"EvilIcons",
+    "iconComponentName5":"AntDesign",
+    "iconName1":"person",
+    "iconName2":"mail",
+    "iconName3":"lock",
+    "iconName4":"sc-facebook",
+    "iconName5":"google",
+    "placeHolder1":"Enter your Username",
+    "placeHolder2":"Enter your email",
+    "placeHolder3":"Enter your password",
+    "signupMethosTitle":"Or SignUp with",
+    "alreadyamember":"Already a member?",
+    "loginLink":"Login"
+}

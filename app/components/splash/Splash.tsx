@@ -1,14 +1,23 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image,StatusBar } from 'react-native'
 import React, { useEffect } from 'react'
 import { splashimg } from './assets';
-
-const Splash = ({navigation:{navigate}}) => {
+interface IProps{
+  navigation:{
+    navigate:(name:string)=>void
+  } 
+}
+const Splash:React.FC<IProps> = ({navigation:{navigate}}) => {
     useEffect(()=>
     {
        setTimeout(() => {
         navigate("Login")
-       }, 2000); 
+       }, 3000); 
     },[])
-  return  <Image source={splashimg}  style={{height:"100%",width:"100%"}}/>
+  return (
+    <View>
+      {/* <StatusBar hidden/> */}
+       <Image source={splashimg}  style={{height:"100%",width:"100%"}}/>
+    </View>
+  )
 }
 export default Splash
