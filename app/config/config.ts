@@ -6,4 +6,4 @@ export const endpoints = {
   LOGIN: 'api/login',
 };
 
-export const salt = 'tek-travels';
+export const salt = 'trip-buz';
