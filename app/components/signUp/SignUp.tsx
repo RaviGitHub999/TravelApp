@@ -15,7 +15,8 @@ interface IProps{
 const SignUp:React.FC<IProps> = ({navigation:{navigate}}) => {
   const handleNavigation=()=>
   {
-    navigate("Login")
+    navigate("Login")  
+    
   }
   return (
     <KeyboardAvoidingView style={styles.container}>
