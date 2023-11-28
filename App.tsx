@@ -5,17 +5,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './app/components/login/Login';
 import SignUp from './app/components/signUp/SignUp';
+import { Provider } from 'react-redux';
+import { store } from './app/redux/store';
+import AppNavigation from './app/components/common/navigation/AppNavigation';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
- <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='Splash'>
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="SignUp" component={SignUp} />
-      </Stack.Navigator>
+    <Provider store={store}>
+      <NavigationContainer>
+      <AppNavigation/>
     </NavigationContainer>
+    </Provider>
   )
 }
 

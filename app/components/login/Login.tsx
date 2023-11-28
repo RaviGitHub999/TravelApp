@@ -1,5 +1,5 @@
-import { View, Text, BackHandler, StatusBar, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, BackHandler, StatusBar, TouchableOpacity, KeyboardAvoidingView, ScrollView, Alert, Button,ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import CustomInput from '../common/customInput/CustomInput';
 import CustomButton from '../common/customButton/CustomButton';
 import { styles } from './styles';
@@ -7,26 +7,55 @@ import IconSwitcher from '../common/icons/IconSwitcher';
 import { colors } from '../../config/theme';
 import { translate } from '../../config/i18n';
 import en from "../../config/locales/en"
+import {useSelector,useDispatch} from "react-redux"
+import { AppDispatch, RootState } from '../../redux/store';
+import { loginAction } from '../../redux/reducers/auth';
+import auth from '@react-native-firebase/auth';
 interface IProps{
   navigation:{
     navigate:(name:string)=>void
   } 
 }
 const Login:React.FC<IProps> = ({navigation:{navigate}}) => {
-  // useEffect(() => {
-  //   const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-  //     BackHandler.exitApp();
-  //     return true;
-  //   });
-  //   return () => backHandler.remove();
-  // }, []);
-  const handleNavigation=()=>
+  const {userRole,loading}=useSelector((state:RootState)=>state.Auth)
+  const dispatch:AppDispatch=useDispatch()
+  const handleNavigation= async()=>
   {
-    navigate("SignUp")
+    dispatch(loginAction())
   }
+  // const handleSignOut = async () => {
+  //   try {
+  //     await auth().signOut();
+  //     console.log('User signed out');
+  //     // You can navigate to another screen or perform actions after successful sign-out
+  //   } catch (erro:any) {
+  //     console.error('Error signing out:', error.message);
+  //     Alert.alert('Error', error.message);
+  //   }
+  // };
+  // useEffect(() => {
+  //   // Subscribe to changes in the user authentication state
+  //   const unsubscribe = auth().onAuthStateChanged((authUser) => {
+  //     setUser(authUser);
+  //   });
+
+  //   // Clean up the subscription when the component unmounts
+  //   return () => unsubscribe();
+  // }, []);
+  // const handleCheckLoginStatus = () => {
+  //   if (user) {
+  //     // User is logged in
+  //     console.log('User is logged in:', user.email);
+  //   } else {
+  //     // User is not logged in
+  //     console.log('User is not logged in');
+  //   }
+  // };
+  //()=>{dispatch(handletoken({navigate}))}
   return (
    <KeyboardAvoidingView style={styles.container}>
      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* { !loading&&<ActivityIndicator size="large" color="#00ff00" />} */}
      <View style={styles.mainContainer}>
       <StatusBar hidden={false} />
       <Text style={styles.title}>{translate(en.login.login)}</Text>
@@ -35,7 +64,7 @@ const Login:React.FC<IProps> = ({navigation:{navigate}}) => {
         <CustomInput iconComponentName={en.login.iconComponentName2} name={en.login.iconName2} placeHolder={en.login.placeHolder2} title={en.login.title2} iconsize={3.6} /></View>
       <Text style={styles.forgotPassword}>{translate(en.login.forgotpassword)}</Text>
       <View style={styles.btnContainer}>
-        <CustomButton title={translate(en.login.login)} />
+        <CustomButton title={translate(en.login.login)} handleSubmit={handleNavigation}/>
       </View>
       <View style={styles.loginMethodsContainer}>
         <Text style={styles.loginmethodsTitle}>{translate(en.login.loginMethosTitle)}</Text>
@@ -47,12 +76,18 @@ const Login:React.FC<IProps> = ({navigation:{navigate}}) => {
             <IconSwitcher componentName={en.login.iconComponentName4} iconName={en.login.iconName4} color={colors.white} iconsize={3.2} />
           </View>
         </View>
-        <View style={styles.loginPageSwitchContainer}>
+        {
+          userRole==="admin"&&
+          <View style={styles.loginPageSwitchContainer}>
           <Text style={styles.loginPageSwitch}>{translate(en.login.notamember)}</Text>
           <TouchableOpacity onPress={handleNavigation}>
             <Text style={styles.signupText}>{en.login.signUpLink}</Text>
           </TouchableOpacity>
+          {/* <Button title="Sign Out" onPress={handleSignOut} />
+          <Button title="Check Login Status" onPress={handleCheckLoginStatus} /> */}
         </View>
+          
+        }
       </View>
     </View>
      </ScrollView>
