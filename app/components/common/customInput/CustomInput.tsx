@@ -10,9 +10,12 @@ interface IProps{
     title:string,
     iconComponentName:string,
     name:string,
-    iconsize?:number
+    iconsize?:number,
+    handleChange:(event:string,name:string)=>void,
+    stateName:string,
+    value:string
 }
-const CustomInput:React.FC<IProps> = ({placeHolder,title,iconComponentName,name,iconsize}) => {
+const CustomInput:React.FC<IProps> = ({placeHolder,title,iconComponentName,name,iconsize,handleChange,stateName,value}) => {
     const [isFocused, setIsFocused] = useState(false);
   const handleFocus = () => {
     setIsFocused(true);
@@ -27,7 +30,10 @@ const CustomInput:React.FC<IProps> = ({placeHolder,title,iconComponentName,name,
       <IconSwitcher componentName={iconComponentName} iconName={name} color={colors.primary} iconsize={iconsize}/>
       <TextInput style={styles.textInputBox} placeholder={placeHolder} 
       onFocus={handleFocus}
-      onBlur={handleBlur}/>  
+      onBlur={handleBlur}
+      onChangeText={(e)=>handleChange(e,stateName)}
+       value={value}
+      />  
    </View>
     </View>
   )

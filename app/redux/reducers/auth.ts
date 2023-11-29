@@ -5,11 +5,14 @@ import Storage from '../../utils/Storage';
 // import {store} from '../store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
+import { Alert } from 'react-native';
 export interface authDataType {
   message: string | null;
   loading: boolean;
   token: string | null;
-  userRole:string
+  userRole:string,
+  email:string,
+  password:string,
 }
  interface LoginProps{
   email:string,
@@ -20,19 +23,18 @@ const initialState: authDataType = {
   message: null,
   loading: false,
   token: null,
-  userRole:"user"
+  userRole:"user",
+  email:"",
+  password:"",
 };
 //{ email, password, navigate }:LoginProps
-export const loginAction = createAsyncThunk('auth/login', async () => {
+export const loginAction = createAsyncThunk('auth/login', async ({navigate}:any) => {
   try {
     const email1="pavan@gmail.com"
     const password1='pavan@gmail'
     const response = await auth().signInWithEmailAndPassword(email1, password1);
-    // console.log('User signed inxxxxxxxxxxxxx!', response.user);
-    // navigate("CustomerBottomNavigation");
-    return response.user;
+    return {user:response.user,navigate};
   } catch (error:any) {
-    console.error('Error signing in:', error.message);
     throw error;
   }
 });
@@ -53,28 +55,38 @@ else{
   action.payload.navigation.navigate("Login")
 }
     },
+    handleOnChangeText:(state,action)=>
+    {
+return{
+  ...state,
+  [action.payload.name]:action.payload.event
+}
+    }
   },
-  extraReducers: builder => {
-    builder.addCase(loginAction.pending, (state) => {
-      state.token = 'token';
-      state.loading = true;
-      state.message = null;
-    });
-    builder.addCase(loginAction.fulfilled, (state, action) => {
-      state.loading = false;
-      state.token = action.payload.uid;
-      state.message = null;
-      state.userRole="user"
-      console.log(action.payload,"khjvghbj")
-    });
-    builder.addCase(loginAction.rejected, (state, action) => {
-      state.loading = false;
-      state.message = 'Please try again!';
-    });
-   
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginAction.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginAction.fulfilled, (state, action) => {
+        state.loading = false;
+        Alert.alert('Login successful!', '', [
+          {
+            text: 'OK',
+            onPress: () => {
+              action.payload.navigate("CustomerBottomNavigation")
+            },
+          },
+        ]);
+      })
+      .addCase(loginAction.rejected, (state, action) => {
+        state.loading = false;
+        Alert.alert('Login failed',JSON.stringify(action.error.message));
+      });
   },
+
 });
 
-export const {handleRole} = AuthSlice.actions;
+export const {handleRole,handleOnChangeText} = AuthSlice.actions;
 
 export default AuthSlice.reducer;

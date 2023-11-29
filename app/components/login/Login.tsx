@@ -9,7 +9,7 @@ import { translate } from '../../config/i18n';
 import en from "../../config/locales/en"
 import {useSelector,useDispatch} from "react-redux"
 import { AppDispatch, RootState } from '../../redux/store';
-import { loginAction } from '../../redux/reducers/auth';
+import { handleOnChangeText, loginAction } from '../../redux/reducers/auth';
 import auth from '@react-native-firebase/auth';
 interface IProps{
   navigation:{
@@ -17,11 +17,15 @@ interface IProps{
   } 
 }
 const Login:React.FC<IProps> = ({navigation:{navigate}}) => {
-  const {userRole,loading}=useSelector((state:RootState)=>state.Auth)
+  const {userRole,loading,email,password}=useSelector((state:RootState)=>state.Auth)
   const dispatch:AppDispatch=useDispatch()
   const handleNavigation= async()=>
   {
-    dispatch(loginAction())
+    dispatch(loginAction({navigate}))
+  }
+  const handleChangeText=(event:string,name:string)=>
+  {
+dispatch(handleOnChangeText({event,name}))
   }
   // const handleSignOut = async () => {
   //   try {
@@ -55,13 +59,13 @@ const Login:React.FC<IProps> = ({navigation:{navigate}}) => {
   return (
    <KeyboardAvoidingView style={styles.container}>
      <ScrollView contentContainerStyle={styles.scrollContainer}>
-      {/* { !loading&&<ActivityIndicator size="large" color="#00ff00" />} */}
+      { loading&&<ActivityIndicator size="large" color="#00ff00" />}
      <View style={styles.mainContainer}>
       <StatusBar hidden={false} />
       <Text style={styles.title}>{translate(en.login.login)}</Text>
       <View style={styles.inputContainer}>
-        <CustomInput iconComponentName={en.login.iconComponentName1} name={en.login.iconName1} placeHolder={en.login.placeHolder1} title={en.login.title1} iconsize={3.6} />
-        <CustomInput iconComponentName={en.login.iconComponentName2} name={en.login.iconName2} placeHolder={en.login.placeHolder2} title={en.login.title2} iconsize={3.6} /></View>
+        <CustomInput iconComponentName={en.login.iconComponentName1} name={en.login.iconName1} placeHolder={en.login.placeHolder1} title={en.login.title1} iconsize={3.6} handleChange={handleChangeText} stateName='email' value={email}/>
+        <CustomInput iconComponentName={en.login.iconComponentName2} name={en.login.iconName2} placeHolder={en.login.placeHolder2} title={en.login.title2} iconsize={3.6} handleChange={handleChangeText} stateName='password' value={password}/></View>
       <Text style={styles.forgotPassword}>{translate(en.login.forgotpassword)}</Text>
       <View style={styles.btnContainer}>
         <CustomButton title={translate(en.login.login)} handleSubmit={handleNavigation}/>
