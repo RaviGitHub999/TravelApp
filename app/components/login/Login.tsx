@@ -13,10 +13,11 @@ import { handleOnChangeText, loginAction } from '../../redux/reducers/auth';
 import auth from '@react-native-firebase/auth';
 interface IProps{
   navigation:{
-    navigate:(name:string)=>void
+    navigate:(name:string)=>void,
+    isFocused:()=>boolean,
   } 
 }
-const Login:React.FC<IProps> = ({navigation:{navigate}}) => {
+const Login:React.FC<IProps> = ({navigation:{navigate,isFocused}}) => {
   const {userRole,loading,email,password}=useSelector((state:RootState)=>state.Auth)
   const dispatch:AppDispatch=useDispatch()
   const handleNavigation= async()=>
@@ -56,10 +57,23 @@ dispatch(handleOnChangeText({event,name}))
   //   }
   // };
   //()=>{dispatch(handletoken({navigate}))}
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (isFocused()) {
+        BackHandler.exitApp();
+        return true;
+      }
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [isFocused]);
   return (
    <KeyboardAvoidingView style={styles.container}>
      <ScrollView contentContainerStyle={styles.scrollContainer}>
-      { loading&&<ActivityIndicator size="large" color="#00ff00" />}
+      {loading&&<View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={colors.facebook} />
+        </View>}
      <View style={styles.mainContainer}>
       <StatusBar hidden={false} />
       <Text style={styles.title}>{translate(en.login.login)}</Text>

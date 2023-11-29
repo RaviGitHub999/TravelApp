@@ -8,7 +8,7 @@ export const fonts = {
     textInput: "Montserrat-Regular",
     textFont: "Montserrat-Medium",
   };
-  
+
   export const lightTheme = {
     primary :"#001219",
     primaryLite : "#108bbc",
@@ -19,9 +19,10 @@ export const fonts = {
     facebook:"#1877f2",
     google:"#df4a32",
     white:"#FFFFFF",
-    black:"#000000"
+    black:"#000000",
+    lightGray:"#505050"
   };
-  
+ 
   export const darkTheme = {
     primary :"#001219",
     primaryLite : "#108bbc",
@@ -32,7 +33,8 @@ export const fonts = {
     facebook:"#1877f2",
     google:"#df4a32",
      white:"#FFFFFF",
-    black:"#000000"
+    black:"#000000",
+    lightGray:"#505050"
    
   };
   

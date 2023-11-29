@@ -28,7 +28,8 @@ const initialState: authDataType = {
   password:"",
 };
 //{ email, password, navigate }:LoginProps
-export const loginAction = createAsyncThunk('auth/login', async ({navigate}:any) => {
+export const loginAction = createAsyncThunk('auth/login', async ({navigate}:any,{getState}:{getState:Function}) => {
+const {email,password}= getState().Auth
   try {
     const email1="pavan@gmail.com"
     const password1='pavan@gmail'
