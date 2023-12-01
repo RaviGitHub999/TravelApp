@@ -7,13 +7,14 @@ import Login from '../../login/Login';
 import CustomerNavigation from './customerNavigation/CustomerNavigation';
 import CustomerBottomNavigation from './customerNavigation/CustomerBottomNavigation';
 import FlightsSearch from '../../flight/FlightsSearch';
+import Dummy from '../../Dummy';
 const Stack = createNativeStackNavigator();
 const AuthNavigation=()=>
 {
   return(
     <Stack.Navigator screenOptions={{headerShown:false}}>
     <Stack.Screen name="Splash" component={Splash} />
-    <Stack.Screen name="Login" component={FlightsSearch} />
+    <Stack.Screen name="Login" component={Dummy} />
     <Stack.Screen name="CustomerBottomNavigation" component={CustomerBottomNavigation}/>
   </Stack.Navigator>
   )

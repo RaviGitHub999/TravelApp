@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import Auth from './reducers/auth';
+import flightReducer from "../redux/reducers/flightSearch"
 export const store = configureStore({
   reducer: {
     Auth,
+    flightReducer
   },
   middleware: getDefaultMiddleware =>
     // getDefaultMiddleware({
