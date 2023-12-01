@@ -33,7 +33,8 @@ export const styles = StyleSheet.create({
         backgroundColor:colors.primaryLite
     },
     section: {
-        padding: 20
+        marginTop:responsiveHeight(3),
+        flex:1
     },
     categoryName: {
         fontSize: responsiveFontSize(2),

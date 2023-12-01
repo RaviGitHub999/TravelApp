@@ -7,6 +7,8 @@ import { responsiveFontSize, responsiveHeight } from '../../utils/responsiveScal
 import { styles } from './styles';
 import FlightsSearch from '../flight/FlightsSearch';
 import HotelSearch from '../hotel/HotelSearch';
+import { KeyboardAvoidingView } from 'react-native';
+import { Platform } from 'react-native';
 //'flights', 'hotel', 'bus', 'train'
 const components = [
   {
@@ -33,17 +35,13 @@ const components = [
 const getContent = (component: string) => {
   switch (component) {
     case 'flights':
-      return "ll";
+      return <FlightsSearch/>;
     case 'hotel':
       return <HotelSearch/>;
     case 'bus':
-      return 'Bus content goes here';
+      return <HotelSearch/>;
     case 'train':
-      return 'Train content goes here';
-    case 'screen5':
-      return 'Screen 5 content goes here';
-    case 'screen6':
-      return 'Screen 6 content goes here';
+      return <HotelSearch/>;
     default:
       return 'Default content goes here';
   }
@@ -79,7 +77,7 @@ const flatListRef=useRef<FlatList>(null)
           }} keyExtractor={item => item.categoryName} horizontal showsHorizontalScrollIndicator={false}   />
         </View>
         <View style={styles.section}>
-          <Text>{getContent(activeComponent)}</Text>
+        {getContent(activeComponent)}
         </View>
       </View>
     </View>

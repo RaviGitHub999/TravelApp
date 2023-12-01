@@ -4,14 +4,15 @@ import { colors, fonts } from "../../config/theme";
 
 export const styles = StyleSheet.create({
     mainConatiner: {
-        borderWidth: 1,
         flex: 1,
-        justifyContent: 'center'
+        // justifyContent: 'center'
     },
     subContainer: {
-        borderWidth: 2,
-        height: '60%',
-        paddingHorizontal: responsiveWidth(5)
+        paddingHorizontal: responsiveWidth(5),
+        paddingVertical:responsiveHeight(3),
+        backgroundColor:colors.highlight,
+        borderRadius:responsiveHeight(2),borderWidth:2,
+        flex:1/1.3,
     },
     btnsContainer: {
         marginRight:responsiveWidth(5),
@@ -19,7 +20,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal:responsiveWidth(4),
         paddingVertical:responsiveHeight(1),
         borderRadius:responsiveHeight(3),
-        marginTop:responsiveHeight(2)
+        // marginTop:responsiveHeight(2)
     },
     active:{
 backgroundColor:colors.primary
@@ -31,5 +32,9 @@ backgroundColor:colors.primary
         fontSize:responsiveFontSize(2.1),
         fontFamily:fonts.primary,
         color:colors.lightGray
+    },
+    fieldsContainer:{
+        marginTop:responsiveHeight(2.8),
+        gap:responsiveHeight(3)
     }
 })
