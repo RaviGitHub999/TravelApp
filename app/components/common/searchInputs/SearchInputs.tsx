@@ -14,14 +14,17 @@ interface IProps {
   placeholder: string,
   customStyles?:any,
   handleDatePicker?:()=>void,
-  datePick?:any
+  datePick?:any,
+  handleChangeText?:((event:string,name:string)=>void),
+  stateName?:string|any,
+  Value?:string
 }
 interface DropDownState {
   dropDownArrow?: boolean,
   dropDownHandle?: boolean
 }
 
-const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyles,datePick,handleDatePicker}) => {
+const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyles,datePick,handleDatePicker,handleChangeText,  stateName,Value}) => {
   const { classes,departure,returnDate} = useSelector((state: RootState) => state.flightReducer)
   const dispatch = useDispatch()
   const [active, setActive] = useState(false)
@@ -88,7 +91,7 @@ const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyle
         :
         (
           <View style={[styles.textInputContainer, active && { borderColor: colors.primary, borderWidth: responsiveHeight(0.3) }]}>
-            <TextInput style={styles.textInputFont} placeholder={placeholder} onFocus={() => handleFocus("input")} onBlur={handleBlur} />
+            <TextInput style={styles.textInputFont} placeholder={placeholder} onFocus={() => handleFocus("input")} onBlur={handleBlur} onChangeText={(e)=>handleChangeText&&handleChangeText(e,stateName)} value={Value}/>
           </View>
         )}
     </View>
