@@ -21,7 +21,7 @@ interface DropDownState {
   dropDownHandle?: boolean
 }
 
-const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyles,datePick}) => {
+const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyles,datePick,handleDatePicker}) => {
   const { classes,departure,returnDate} = useSelector((state: RootState) => state.flightReducer)
   const dispatch = useDispatch()
   const [active, setActive] = useState(false)
@@ -59,14 +59,15 @@ const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyle
     return returnDate
   }
 }
+// :activeBtn?`${handleDate(datePick)}`
   return (
     <View>
       {btn ?
         <View>
           <View style={[styles.btnMainContainer, activeBtn && { borderColor:colors.primary, borderWidth: responsiveHeight(0.3) },customStyles]}>
             <TouchableOpacity onPressIn={() => handleFocus("btn")}
-              onPressOut={handlePressOut} style={styles.btn}>
-              <Text style={styles.btnText}>{dropDown ? classes:activeBtn?`${handleDate(datePick)}`: placeholder}</Text>
+              onPressOut={handlePressOut} style={styles.btn} onPress={handleDatePicker}>
+              <Text style={styles.btnText}>{dropDown ? classes: placeholder}</Text>
               {dropDown && (dropDownState.dropDownArrow ? <IconSwitcher componentName='AntDesign' iconName='caretup' iconsize={2.2} /> : <IconSwitcher componentName='AntDesign' iconName='caretdown' iconsize={2.2} />)}
             </TouchableOpacity>
           </View>

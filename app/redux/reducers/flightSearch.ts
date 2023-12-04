@@ -2,13 +2,15 @@ import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 const initialState={
 origin:"",
 destination:"",
-departure:new Date(),
-returnDate:new Date(),
+departure:"Departure Date",
+returnDate:"Return Date",
 adults:0,
 children:0,
 infants:0,
 classes:"Economy",
-directflight:false
+directflight:false,
+dateValue:new Date(),
+returnDateValue:new Date()
 }
 
 export const flightSearch=createSlice(
@@ -41,7 +43,27 @@ handleDepartureDateChange :(state,action)=>
     console.log(action.payload,"lkjh")
 if(action.payload)
 {
-    state.departure=action.payload
+   
+    const formattedDate = action.payload.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+      state.departure=formattedDate
+      state.dateValue=action.payload
+}
+},
+handleReturnDateChange :(state,action)=>
+{
+    console.log(action.payload,"lkjh")
+if(action.payload)
+{
+   
+    const formattedDate = action.payload.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+      state.returnDate=formattedDate
+      state.returnDateValue=action.payload
 }
 }
 },
@@ -50,5 +72,5 @@ extraReducers:(builder)=>
 
 }
 })
-export const {handleClass,handleDropDownState,handleDepartureDateChange}=flightSearch.actions
+export const {handleClass,handleDropDownState,handleDepartureDateChange,handleReturnDateChange}=flightSearch.actions
 export default flightSearch.reducer
