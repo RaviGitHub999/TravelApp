@@ -36,5 +36,20 @@ backgroundColor:colors.primary
     fieldsContainer:{
         marginTop:responsiveHeight(2.8),
         gap:responsiveHeight(3)
+    },
+    airportOriginDataContainer:{
+        borderWidth:1,
+        height:responsiveHeight(30),
+        borderRadius:responsiveHeight(1.5),
+        backgroundColor:colors.white
+    },
+    renderItemsContainer:{
+        flexDirection:'row',
+        justifyContent:'space-between',
+        paddingHorizontal:responsiveWidth(2.5),
+        marginTop:responsiveHeight(1.5)
+    },
+    airportName:{
+        fontSize:responsiveFontSize(1.6)
     }
 })

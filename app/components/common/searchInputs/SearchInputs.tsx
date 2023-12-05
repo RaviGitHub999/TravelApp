@@ -25,10 +25,11 @@ interface DropDownState {
 }
 
 const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyles,datePick,handleDatePicker,handleChangeText,  stateName,Value}) => {
-  const { classes,departure,returnDate} = useSelector((state: RootState) => state.flightReducer)
+  const { classes,departure,returnDate,originSelectedAirport} = useSelector((state: RootState) => state.flightReducer)
   const dispatch = useDispatch()
   const [active, setActive] = useState(false)
   const [activeBtn, setActiveBtn] = useState(false)
+  const[btnOrTextInput,setBtnOrTextInput]=useState(false)
   const [dropDownState, setDropDownState] = useState<DropDownState>({ dropDownArrow: false, dropDownHandle: false })
   const handleFocus = (name: string) => {
     if (name === "input") {
@@ -41,6 +42,7 @@ const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyle
   }
   const handleBlur = () => {
     setActive(false);
+    setBtnOrTextInput(false)
   }
   const handlePressOut = () => {
     setTimeout(() => {
@@ -63,6 +65,7 @@ const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyle
   }
 }
 // :activeBtn?`${handleDate(datePick)}`
+console.log(originSelectedAirport)
   return (
     <View>
       {btn ?
@@ -90,9 +93,13 @@ const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyle
         </View>
         :
         (
-          <View style={[styles.textInputContainer, active && { borderColor: colors.primary, borderWidth: responsiveHeight(0.3) }]}>
-            <TextInput style={styles.textInputFont} placeholder={placeholder} onFocus={() => handleFocus("input")} onBlur={handleBlur} onChangeText={(e)=>handleChangeText&&handleChangeText(e,stateName)} value={Value}/>
-          </View>
+          btnOrTextInput?<View style={[styles.textInputContainer, active && { borderColor: colors.primary, borderWidth: responsiveHeight(0.3) }]}>
+          <TextInput style={styles.textInputFont} placeholder={placeholder} onFocus={() => handleFocus("input")} onBlur={handleBlur} onChangeText={(e)=>handleChangeText&&handleChangeText(e,stateName)} value={Value}/>
+        </View>:<TouchableOpacity  onPress={()=>setBtnOrTextInput(true)} style={styles.btnorTextInput}>
+            <Text style={styles.textInputFont}>
+              {originSelectedAirport?.length===0?placeholder:<Text>{originSelectedAirport.name}</Text>}
+              </Text>
+          </TouchableOpacity>
         )}
     </View>
   )

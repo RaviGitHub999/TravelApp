@@ -42,6 +42,13 @@ export const styles=StyleSheet.create(
             fontSize:responsiveFontSize(2),
             fontFamily:fonts.textInput,
             color:colors.primary
+        },
+        btnorTextInput:{
+            height:responsiveHeight(7),
+           justifyContent:'center',
+           paddingHorizontal:responsiveWidth(5),
+           borderRadius:responsiveHeight(1.5),
+           backgroundColor:"rgb(26, 246, 246)",
         }
     }
 )
