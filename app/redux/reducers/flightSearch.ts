@@ -20,12 +20,27 @@ interface InitialState {
         address: { cityName: string; countryName: string }
     }[],
     airportOriginLoading: boolean,
-    desRes:boolean,
-    originSelectedAirport:{
+    desRes: boolean,
+    oriRes: boolean,
+    originSelectedAirport: {
+        name: string;
+        iataCode: string;
+        address: { cityName: string; countryName: string }
+    },
+    destinationSelectedAirPort: {
+        name: string;
+        iataCode: string;
+        address: { cityName: string; countryName: string }
+    },
+    airportDestinationData: {
         name: string;
         iataCode: string;
         address: { cityName: string; countryName: string }
     }[],
+    airportDestinationLoading: boolean,
+    originselected:boolean,
+    destinationselected:boolean,
+    journeyWay:string
 }
 const initialState: InitialState = {
     origin: "",
@@ -41,8 +56,29 @@ const initialState: InitialState = {
     returnDateValue: new Date(),
     airportOriginData: [],
     airportOriginLoading: false,
-    desRes:false,
-    originSelectedAirport:[]
+    desRes: false,
+    oriRes: false,
+    originSelectedAirport:{
+        name: "",
+        iataCode: "",
+        address: {
+            cityName: "",
+            countryName: ""
+        }
+    },
+    destinationSelectedAirPort: {
+        name: "",
+        iataCode: "",
+        address: {
+            cityName: "",
+            countryName: ""
+        }
+    },
+    airportDestinationData: [],
+    airportDestinationLoading: false,
+    originselected:false,
+    destinationselected:false,
+    journeyWay:"1"
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -56,9 +92,14 @@ const debounce: DebounceFunction = (cb, delay) => {
         }, delay);
     };
 };
+const fuse = new Fuse(AirportsData, {
+    keys: ["cityName", "name", "iataCode", "countryName"],
+    includeScore: true,
+    threshold: 0.2
+});
 let airportSearchController: CancelTokenSource | null = null;
-export const searchAirport = createAsyncThunk(
-    'flightSearch/searchAirport',
+export const searchOriginAirport = createAsyncThunk(
+    'flightSearch/searchOriginAirport',
     async (query: string) => {
         if (airportSearchController) {
             airportSearchController.cancel("Request canceled due to new search");
@@ -96,12 +137,77 @@ export const searchAirport = createAsyncThunk(
     }
 );
 
-export const debouncedSearchAirport = debounce((dispatch: any, getState: Function, query: string) => {
+export const debouncedSearchOriginAirport = debounce((dispatch: any, getState: Function, query: string) => {
 
     if (query.trim() !== "") {
         const localResults = fuse.search(query);
         if (localResults.length <= 0) {
-            dispatch(searchAirport(query));
+            dispatch(searchOriginAirport(query));
+        } else {
+
+            dispatch(flightSearch.actions.selectOrigin(localResults.map((res, r) => {
+                var item = res.item;
+                return {
+                    name: item.name,
+                    iataCode: item.iataCode,
+                    address: {
+                        cityName: item.cityName,
+                        countryName: item.countryName
+                    }
+                };
+
+            })));
+        }
+    }
+    else {
+        dispatch(flightSearch.actions.handleairportOriginLoading())
+    }
+}, 500);
+
+export const searchDestinationAirport = createAsyncThunk(
+    'flightSearch/searchDestinationAirport',
+    async (query: string) => {
+        if (airportSearchController) {
+            airportSearchController.cancel("Request canceled due to new search");
+        }
+
+        const source = axios.CancelToken.source();
+        airportSearchController = source;
+
+        try {
+            const response = await axios.post(
+                "https://us-central1-tripfriday-2b399.cloudfunctions.net/paymentApi/airportSearch",
+                { keyword: query, subType: "CITY,AIRPORT", page: 0 },
+                { cancelToken: source.token }
+            );
+
+            const data = response?.data?.data || [];
+            const uniqueResults = data.reduce((unique: any[], current: { iataCode: any; subType: string; }) => {
+                const existingIndex = unique.findIndex(item => item.iataCode === current.iataCode);
+                if (existingIndex === -1) {
+                    unique.push(current);
+                } else if (unique[existingIndex].subType === "CITY" && current.subType === "AIRPORT") {
+                    unique[existingIndex] = current;
+                }
+                return unique;
+            }, []);
+
+            return uniqueResults;
+        } catch (error) {
+            if (axios.isCancel(error)) {
+                console.log("Request canceled:", error.message);
+            } else {
+                throw error;
+            }
+        }
+    }
+);
+export const debouncedSearchDestinationAirport = debounce((dispatch: any, getState: Function, query: string) => {
+
+    if (query.trim() !== "") {
+        const localResults = fuse.search(query);
+        if (localResults.length <= 0) {
+            dispatch(searchDestinationAirport(query));
         } else {
 
             dispatch(flightSearch.actions.selectdestination(localResults.map((res, r) => {
@@ -119,27 +225,9 @@ export const debouncedSearchAirport = debounce((dispatch: any, getState: Functio
         }
     }
     else {
-        dispatch(flightSearch.actions.handleState())
+        dispatch(flightSearch.actions.handleairportDestinationLoading())
     }
 }, 500);
-// const airportKeywordReq = (keyword:string) => {
-//     if (abortAirportController) {
-//       abortAirportController.abort();
-//     }
-//     abortAirportController = new AbortController();
-//     console.log(`Req for`, keyword);
-//     return axios.post(
-//       "https://us-central1-tripfriday-2b399.cloudfunctions.net/paymentApi/airportSearch",
-//       { keyword, subType: "CITY,AIRPORT", page: 0 },
-//       { signal: abortAirportController.signal }
-//     );
-//   };
-
-const fuse = new Fuse(AirportsData, {
-    keys: ["cityName", "name", "iataCode", "countryName"],
-    includeScore: true,
-    threshold: 0.2
-});
 export const flightSearch = createSlice(
     {
         name: "flightSearch",
@@ -172,6 +260,7 @@ export const flightSearch = createSlice(
                     });
                     state.departure = formattedDate
                     state.dateValue = action.payload
+                    console.log(action.payload,"==========")
                 }
             },
             handleReturnDateChange: (state, action) => {
@@ -183,111 +272,106 @@ export const flightSearch = createSlice(
                     });
                     state.returnDate = formattedDate
                     state.returnDateValue = action.payload
+                    console.log(action.payload,"==========",new Date())
                 }
             },
-            handleChangeTextInput: (state, action) => {
+            handleChangeOriginTextInput: (state, action) => {
+                const query = action.payload.e.trim();
+                const loading1 = query !== "" ? true : false;
+                return {
+                    ...state,
+                    [action.payload.name]: action.payload.e,
+                    airportOriginLoading: loading1,
+                    oriRes: loading1,
+                    airportOriginData: [],
+                }
+            },
+            handleChangeDestinationTextInput: (state, action) => {
                 const query = action.payload.e.trim();
                 const loading = query !== "" ? true : false;
                 return {
                     ...state,
                     [action.payload.name]: action.payload.e,
-                    airportOriginLoading: loading,
-                    desRes:loading,
-                    airportOriginData:[]
+                    airportDestinationLoading: loading,
+                    desRes: loading,
+                    airportDestinationData: [],
                 }
             },
-            selectdestination: (state, action) => {
+            selectOrigin: (state, action) => {
                 state.airportOriginLoading = false;
                 state.airportOriginData = action.payload;
             },
-            handleState: (state) => {
+            handleairportOriginLoading: (state) => {
                 state.airportOriginLoading = false
             },
-            //               handle1:(state)=>
-            //               {
-            // state.airportOriginLoading=false
-            //               },
-            //               handle2:(state)=>
-            //               {
-            //                 state.airportOriginLoading=true
-            //               },
-            // selectdestination: (state, action) => {
-            //    state.airportOriginLoading=true
-            //     const debouncedSearch = debounce(async (query: string) => {
-            //         if (query !== "") {
-            //             try {
-            //                 const results = fuse.search(query);
-            //                 console.log(results)
-            //                 if (results.length > 0) {
-            //                     var data = results.map((res, r) => {
-            //                         var item = res.item;
-            //                         return {
-            //                             name: item.name,
-            //                             iataCode: item.iataCode,
-            //                             address: {
-            //                                 cityName: item.cityName,
-            //                                 countryName: item.countryName
-            //                             }
-            //                         };
-            //                     });
-            //                     state.airportOriginData = data
-            //                     state.airportOriginLoading = true
-            //                 }
-            //                 else{
-            //                     let data=await airportKeywordReq(action.payload)
-            //                     console.log(data,"other==============1")
-            //                     state.airportOriginData = data?.data?.data,
-            //                     state.airportOriginLoading = false
-            //                 }
-            //             } catch (error) {
-            //                 console.log(error,"kjkj")
-            //             }
+            selectdestination: (state, action) => {
+                state.airportDestinationLoading = false;
+                state.airportDestinationData = action.payload;
+            },
+            handleairportDestinationLoading: (state) => {
+                state.airportOriginLoading = false
+            },
 
-            //         }
-            //         else {
-            //             if (abortAirportController) {
-            //               abortAirportController.abort();
-            //             }
-            //                 state.airportOriginData= [],
-            //                 state.airportOriginLoading = false
-            //           }
-            //         //   state.airportOriginData = data
-            //           state.airportOriginLoading = false
-            //     }, 500)
-            //     debouncedSearch(action.payload);
-            // },
-handleOriginSelectedAirPort:(state,action)=>
-{
-    return{
-    ...state,
-    originSelectedAirport:action.payload,
-    desRes:!state.desRes,
-    origin:'',
-    departure:''
-    }
-}
+            handleOriginSelectedAirPort: (state, action) => {
+                return {
+                    ...state,
+                    originSelectedAirport: action.payload,
+                    oriRes: !state.oriRes,
+                    origin: '',
+                    originselected:true
+                }
+            },
+            handleDestinationSelectedAirPort: (state, action) => {
+                return {
+                    ...state,
+                    destinationSelectedAirPort: action.payload,
+                    desRes: !state.desRes,
+                    destination: '',
+                    destinationselected:true
+                }
+            },
+            handleJourneyWay:(state,action)=>
+            {
+state.journeyWay=action.payload
+            }
         },
 
         extraReducers: (builder) => {
-            builder.addCase(searchAirport.fulfilled, (state, action) => {
+            builder.addCase(searchOriginAirport.fulfilled, (state, action) => {
                 state.airportOriginLoading = false;
                 state.airportOriginData = action.payload;
             });
 
-            builder.addCase(searchAirport.pending, (state) => {
+            builder.addCase(searchOriginAirport.pending, (state) => {
                 state.airportOriginLoading = true;
             });
 
-            builder.addCase(searchAirport.rejected, (state) => {
+            builder.addCase(searchOriginAirport.rejected, (state) => {
                 state.airportOriginLoading = false;
                 state.airportOriginData = [];
             });
+            builder.addCase(searchDestinationAirport.fulfilled, (state, action) => {
+                state.airportDestinationLoading = false;
+                state.airportDestinationData = action.payload;
+            });
+
+            builder.addCase(searchDestinationAirport.pending, (state) => {
+                state.airportDestinationLoading = true;
+            });
+
+            builder.addCase(searchDestinationAirport.rejected, (state) => {
+                state.airportDestinationLoading = false;
+                state.airportDestinationData = [];
+            });
         },
     })
-export const selectDestinationWithDebounce = (query: string) => (dispatch: any, getState: any) => {
-    debouncedSearchAirport(dispatch, getState, query);
+export const selectOriginWithDebounce = (query: string) => (dispatch: any, getState: any) => {
+    debouncedSearchOriginAirport(dispatch, getState, query);
 };
-export const { handleClass, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleChangeTextInput,handleOriginSelectedAirPort} = flightSearch.actions
+export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
+    debouncedSearchDestinationAirport(dispatch, getState, query)
+}
+export const { handleClass, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput,handleJourneyWay} = flightSearch.actions
 export default flightSearch.reducer
 
 

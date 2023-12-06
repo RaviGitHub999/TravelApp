@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState,useMemo } from 'react'
 import IconSwitcher from '../icons/IconSwitcher'
 import { useDispatch, useSelector, } from 'react-redux'
 import { RootState } from "../../../redux/store"
@@ -17,15 +17,25 @@ interface IProps {
   datePick?:any,
   handleChangeText?:((event:string,name:string)=>void),
   stateName?:string|any,
-  Value?:string
+  Value?:string,
+  selectedObj?: {
+    name: string;
+    iataCode: string;
+    address: { cityName: string; countryName: string }
+},
+selected?:boolean
 }
 interface DropDownState {
   dropDownArrow?: boolean,
   dropDownHandle?: boolean
 }
 
-const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyles,datePick,handleDatePicker,handleChangeText,  stateName,Value}) => {
-  const { classes,departure,returnDate,originSelectedAirport} = useSelector((state: RootState) => state.flightReducer)
+const SearchInputs: React.FC<IProps> = ({ btn, dropDown,selected, placeholder,customStyles,datePick,handleDatePicker,handleChangeText,  stateName,Value,selectedObj}) => {
+  const { classes,departure,returnDate,originSelectedAirport,oriRes} = useSelector((state: RootState) => state.flightReducer)
+  const memoizedClasses = useMemo(() => classes, [classes]);
+  const memoizedDeparture = useMemo(() => departure, [departure]);
+  const memoizedReturnDate = useMemo(() => returnDate, [returnDate]);
+  const memoizedOriginSelectedAirport = useMemo(() => originSelectedAirport, [originSelectedAirport]);
   const dispatch = useDispatch()
   const [active, setActive] = useState(false)
   const [activeBtn, setActiveBtn] = useState(false)
@@ -59,13 +69,13 @@ const SearchInputs: React.FC<IProps> = ({ btn, dropDown, placeholder,customStyle
 {
   switch (name) {
     case "departure":
-  return departure
+  return memoizedDeparture
   case "return":
-    return returnDate
+    return memoizedReturnDate
   }
 }
 // :activeBtn?`${handleDate(datePick)}`
-console.log(originSelectedAirport)
+// console.log(originSelectedAirport)
   return (
     <View>
       {btn ?
@@ -94,11 +104,18 @@ console.log(originSelectedAirport)
         :
         (
           btnOrTextInput?<View style={[styles.textInputContainer, active && { borderColor: colors.primary, borderWidth: responsiveHeight(0.3) }]}>
-          <TextInput style={styles.textInputFont} placeholder={placeholder} onFocus={() => handleFocus("input")} onBlur={handleBlur} onChangeText={(e)=>handleChangeText&&handleChangeText(e,stateName)} value={Value}/>
+          <TextInput style={styles.textInputFont} placeholder={placeholder} onFocus={() => handleFocus("input")} onBlur={handleBlur} onChangeText={(e)=>handleChangeText&&handleChangeText(e,stateName)} value={Value} autoFocus={true}/>
         </View>:<TouchableOpacity  onPress={()=>setBtnOrTextInput(true)} style={styles.btnorTextInput}>
-            <Text style={styles.textInputFont}>
-              {originSelectedAirport?.length===0?placeholder:<Text>{originSelectedAirport.name}</Text>}
-              </Text>
+            
+              {!selected?<Text style={styles.textInputFont}>{placeholder}</Text>:
+              <View style={styles.selectedAirportContainer}>
+                <Text>{selectedObj?.address.cityName}</Text>
+                <View style={{flexDirection:"row"}}>
+                <Text>{selectedObj?.iataCode}, </Text>
+                <Text>{selectedObj?.name}</Text>
+                </View>
+                </View>}
+            
           </TouchableOpacity>
         )}
     </View>

@@ -49,6 +49,11 @@ export const styles=StyleSheet.create(
            paddingHorizontal:responsiveWidth(5),
            borderRadius:responsiveHeight(1.5),
            backgroundColor:"rgb(26, 246, 246)",
+        },
+        selectedAirportContainer:{
+            flex:1,
+            justifyContent:'center',
+            rowGap:responsiveHeight(0.5)
         }
     }
 )
