@@ -7,7 +7,7 @@ import DropDown from '../common/dropDown/DropDown'
 import CustomButton from '../common/customButton/CustomButton'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux'
-import { handleChangeOriginTextInput, handleChangeDestinationTextInput, handleDepartureDateChange, handleOriginSelectedAirPort, handleReturnDateChange, selectDestinationWithDebounce, selectOriginWithDebounce, handleDestinationSelectedAirPort, handleJourneyWay } from '../../redux/reducers/flightSearch'
+import { handleChangeOriginTextInput, handleChangeDestinationTextInput, handleDepartureDateChange, handleOriginSelectedAirPort, handleReturnDateChange, selectDestinationWithDebounce, selectOriginWithDebounce, handleDestinationSelectedAirPort, handleJourneyWay, flightSearching } from '../../redux/reducers/flightSearch'
 import { AppDispatch, RootState } from '../../redux/store'
 const btns = [{ journeyType: "One Way", journeyTypeNo: "1" }, { journeyType: "Round Trip", journeyTypeNo: "2" }]
 interface IBtns {
@@ -134,7 +134,7 @@ const FlightsSearch = () => {
             <DropDown length={9} particularState='infants' />
           </View>
           <SearchInputs btn={true} dropDown={true} placeholder='Origin' />
-          <CustomButton title='Search Flight' handleSubmit={() => { }} />
+          <CustomButton title='Search Flight' handleSubmit={() => {dispatch(flightSearching()) }} />
         </View>
         {calenderOpen.departureCalender && <DateTimePicker
           value={dateValue}
