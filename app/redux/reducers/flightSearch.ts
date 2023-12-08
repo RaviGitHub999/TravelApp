@@ -8,7 +8,7 @@ getState:Function,
 fulfillWithValue:Function,
 rejectWithValue:Function
 }
-interface SelectedFlightObj{
+export interface SelectedFlightObj{
     name: string;
     iataCode: string;
     address: { cityName: string; countryName: string }
@@ -56,7 +56,9 @@ interface InitialState {
     journeyWay:string,
     outbound:string,
     inbound:string,
-    cabinClassId:string
+    cabinClassId:string,
+    departureformattedDate:string,
+    returnformattedDate:string
 }
 const initialState: InitialState = {
     origin: "",
@@ -98,7 +100,9 @@ const initialState: InitialState = {
     journeyWay:"1",
     outbound:"",
     inbound:"",
-    cabinClassId:"1"
+    cabinClassId:"1",
+    departureformattedDate:"",
+    returnformattedDate:""
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -373,7 +377,8 @@ state.cabinClassId=classId
                         month: 'short',
                         day: 'numeric',
                     });
-                    state.departure = formattedDate
+                    state.departure = formattedDate,
+                    state.departureformattedDate=formattedDate,
                     state.dateValue=action.payload
                 const inputDate = new Date(action.payload);
                 const dateString =  inputDate.toISOString();
@@ -387,7 +392,8 @@ state.cabinClassId=classId
                         month: 'short',
                         day: 'numeric',
                     });
-                    state.returnDate = formattedDate
+                    state.returnDate = formattedDate,
+                    state.returnformattedDate=formattedDate
                     state.returnDateValue=action.payload
                     const inputDate = new Date(action.payload);
                 const dateString =  inputDate.toISOString();

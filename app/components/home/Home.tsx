@@ -32,22 +32,22 @@ const components = [
     componentName: "MaterialIcons"
   },
 ];
-const getContent = (component: string) => {
+const getContent = (component: string,props:any) => {
   switch (component) {
     case 'flights':
-      return <FlightsSearch/>;
+      return <FlightsSearch {...props}/>;
     case 'hotel':
-      return <HotelSearch/>;
+      return <HotelSearch  {...props}/>;
     case 'bus':
-      return <HotelSearch/>;
+      return <HotelSearch  {...props}/>;
     case 'train':
-      return <HotelSearch/>;
+      return <HotelSearch  {...props}/>;
     default:
       return 'Default content goes here';
   }
 };
 
-const Home = () => {
+const Home = (props:any) => {
   const [activeComponent, setActiveComponent] = useState(components[0].categoryName);
 const flatListRef=useRef<FlatList>(null)
   const switchComponent = (component:string) => {
@@ -77,7 +77,7 @@ const flatListRef=useRef<FlatList>(null)
           }} keyExtractor={item => item.categoryName} horizontal showsHorizontalScrollIndicator={false}   />
         </View>
         <View style={styles.section}>
-        {getContent(activeComponent)}
+        {getContent(activeComponent,{...props})}
         </View>
       </View>
     </View>

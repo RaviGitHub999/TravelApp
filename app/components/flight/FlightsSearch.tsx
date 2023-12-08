@@ -7,7 +7,7 @@ import DropDown from '../common/dropDown/DropDown'
 import CustomButton from '../common/customButton/CustomButton'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux'
-import { handleChangeOriginTextInput, handleChangeDestinationTextInput, handleDepartureDateChange, handleOriginSelectedAirPort, handleReturnDateChange, selectDestinationWithDebounce, selectOriginWithDebounce, handleDestinationSelectedAirPort, handleJourneyWay, flightSearching } from '../../redux/reducers/flightSearch'
+import { handleChangeOriginTextInput, handleChangeDestinationTextInput, handleDepartureDateChange, handleOriginSelectedAirPort, handleReturnDateChange, selectDestinationWithDebounce, selectOriginWithDebounce, handleDestinationSelectedAirPort, handleJourneyWay, flightSearching, SelectedFlightObj } from '../../redux/reducers/flightSearch'
 import { AppDispatch, RootState } from '../../redux/store'
 const btns = [{ journeyType: "One Way", journeyTypeNo: "1" }, { journeyType: "Round Trip", journeyTypeNo: "2" }]
 interface IBtns {
@@ -18,16 +18,20 @@ interface CalenderOpen {
   departureCalender?: boolean,
   returCalender?: boolean
 }
-const FlightsSearch = () => {
+interface IProps{
+  navigation:{
+    navigate:(arg:string)=>void
+  }
+}
+const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
   const [active, setActive] = useState(btns[0].journeyType)
   const [calenderOpen, setCalenderOpen] = useState<CalenderOpen>({ departureCalender: false, returCalender: false })
-  const { departure, returnDate, dateValue, returnDateValue, origin, destination, airportOriginLoading, airportDestinationLoading, airportOriginData, desRes, airportDestinationData, oriRes, originSelectedAirport, destinationSelectedAirPort, originselected, destinationselected } = useSelector((State: RootState) => State.flightReducer)
+  const { departure,departureformattedDate, returnDate, dateValue, returnDateValue, origin, destination, airportOriginLoading, airportDestinationLoading, airportOriginData, desRes, airportDestinationData, oriRes, originSelectedAirport, destinationSelectedAirPort, originselected, destinationselected } = useSelector((State: RootState) => State.flightReducer)
   const dispatch: AppDispatch = useDispatch()
-  const handleActive=(item:IBtns)=>
-  {
-    setActive(item.journeyType)
-    dispatch(handleJourneyWay(item.journeyTypeNo))
-  }
+  const handleActive = useCallback((item: IBtns) => {
+    setActive(item.journeyType);
+    dispatch(handleJourneyWay(item.journeyTypeNo));
+  }, [dispatch]);
   const handleRender = useCallback(({ item }: { item: IBtns }) => {
     return (
       <TouchableOpacity style={[styles.btnsContainer, active === item.journeyType && styles.active]}
@@ -66,11 +70,30 @@ const FlightsSearch = () => {
       dispatch(handleChangeOriginTextInput({ e, name }))
     }
     else {
-      console.log("ho")
       dispatch(selectDestinationWithDebounce(e))
       dispatch(handleChangeDestinationTextInput({ e, name }))
     }
   }
+  const MemoizedAirportItem = React.memo(( item:SelectedFlightObj ) => (
+    <TouchableOpacity style={styles.renderItemsContainer} onPress={() => dispatch(handleOriginSelectedAirPort(item))}>
+    <View>
+      <Text>{`${item.address.cityName},${item.address.countryName}`}</Text>
+      <Text style={styles.airportName}>{item.name}</Text>
+    </View>
+    <View>
+      <Text>{item.iataCode}</Text>
+    </View>
+  </TouchableOpacity>
+  ));
+const handleSearch=()=>
+{
+if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.cityName&&departureformattedDate.length!==0)
+  navigate("OneWayFlights")
+  // dispatch(flightSearching()) 
+}
+
+
+
   return (
     <View style={styles.subContainer}>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} >
@@ -84,19 +107,7 @@ const FlightsSearch = () => {
                   <Text>Loading......</Text>
                 ) : airportOriginData.length === 0 ?
                   <Text>No Data!!!</Text> : <View style={{ flex: 1 }}>
-                    <FlatList data={airportOriginData} renderItem={({ item }) => {
-                      return (
-                        <TouchableOpacity style={styles.renderItemsContainer} onPress={() => dispatch(handleOriginSelectedAirPort(item))}>
-                          <View>
-                            <Text>{`${item.address.cityName},${item.address.countryName}`}</Text>
-                            <Text style={styles.airportName}>{item.name}</Text>
-                          </View>
-                          <View>
-                            <Text>{item.iataCode}</Text>
-                          </View>
-                        </TouchableOpacity>
-                      )
-                    }} nestedScrollEnabled style={styles.airportOriginDataContainer} />
+                    <FlatList data={airportOriginData} renderItem={({ item }:any) => <MemoizedAirportItem {...item} />} nestedScrollEnabled style={styles.airportOriginDataContainer} />
                   </View>}
               </View> : null
           }
@@ -134,7 +145,7 @@ const FlightsSearch = () => {
             <DropDown length={9} particularState='infants' />
           </View>
           <SearchInputs btn={true} dropDown={true} placeholder='Origin' />
-          <CustomButton title='Search Flight' handleSubmit={() => {dispatch(flightSearching()) }} />
+          <CustomButton title='Search Flight' handleSubmit={handleSearch} />
         </View>
         {calenderOpen.departureCalender && <DateTimePicker
           value={dateValue}
