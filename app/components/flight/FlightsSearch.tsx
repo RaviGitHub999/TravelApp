@@ -33,6 +33,7 @@ const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
     dispatch(handleJourneyWay(item.journeyTypeNo));
   }, [dispatch]);
   const handleRender = useCallback(({ item }: { item: IBtns }) => {
+    
     return (
       <TouchableOpacity style={[styles.btnsContainer, active === item.journeyType && styles.active]}
         onPress={() => handleActive(item)}>
@@ -41,6 +42,8 @@ const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
     );
   }, [active, setActive]);
   const handleSelectedDate = useCallback((event: DateTimePickerEvent, selectedDate?: Date) => {
+    console.log("clicked");
+    // debugger
     if (event.type === 'set') {
       setCalenderOpen({ departureCalender: false });
       dispatch(handleDepartureDateChange(selectedDate));
@@ -87,8 +90,9 @@ const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
   ));
 const handleSearch=()=>
 {
-if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.cityName&&departureformattedDate.length!==0)
   navigate("OneWayFlights")
+if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.cityName&&departureformattedDate.length!==0)
+  {}
   // dispatch(flightSearching()) 
 }
 
