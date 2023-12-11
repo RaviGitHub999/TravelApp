@@ -58,7 +58,9 @@ interface InitialState {
     inbound:string,
     cabinClassId:string,
     departureformattedDate:string,
-    returnformattedDate:string
+    returnformattedDate:string,
+    flightsData:any[],
+    flightSearchLoading:boolean
 }
 const initialState: InitialState = {
     origin: "",
@@ -102,7 +104,9 @@ const initialState: InitialState = {
     inbound:"",
     cabinClassId:"1",
     departureformattedDate:"",
-    returnformattedDate:""
+    returnformattedDate:"",
+    flightsData:[],
+    flightSearchLoading:false
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -491,14 +495,19 @@ state.journeyWay=action.payload
             });
 
             builder.addCase(flightSearching.fulfilled, (state, action) => {
-                console.log(action.payload.flightResult.Response,"data")
+                console.log(action.payload.flightResult.Response.Results,"data")
+                state.flightsData=action.payload.flightResult.Response.Results,
+                state.flightSearchLoading=false
             });
 
             builder.addCase(flightSearching.pending, (state) => {
+                state.flightSearchLoading=true
                 console.log("pending")
             });
 
             builder.addCase(flightSearching.rejected, (state) => {
+                state.flightSearchLoading=false
+                state.flightsData=[]
                 console.log("rejected")
             });
 

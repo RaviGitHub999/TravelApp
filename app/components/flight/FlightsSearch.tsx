@@ -90,10 +90,13 @@ const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
   ));
 const handleSearch=()=>
 {
-  navigate("OneWayFlights")
+ 
 if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.cityName&&departureformattedDate.length!==0)
-  {}
-  // dispatch(flightSearching()) 
+  {
+    navigate("OneWayFlights")
+    dispatch(flightSearching()) 
+  }
+  
 }
 
 

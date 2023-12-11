@@ -1,68 +1,83 @@
-import { View, Text, TouchableOpacity,FlatList} from 'react-native'
+import { View, Text, TouchableOpacity,FlatList, Button} from 'react-native'
 import React ,{useState} from 'react'
 import { styles } from './styles'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../redux/store'
 import IconSwitcher from '../common/icons/IconSwitcher'
 import { colors } from '../../config/theme'
-const data=[
-    [
-      { name: 'ravi', age: 20 },
-      { name: 'rishi', age: 21 },
-      { name: 'kiran', age: 22 }
-    ],
-    [
-      { name: 'red', age: 20 },
-      { name: 'green', age: 21 },
-      { name: 'blue', age: 22 }
-    ],
-    [
-      { name: 'white', age: 20 },
-      { name: 'black', age: 21 },
-      { name: 'navyBlue', age: 22 }
-    ]
-  ]
+import FlightDataCard from './FlightDataCard'
+// const data=[
+//   [
+//     {segment:[[{name: 'ravi', age: 20},{ name: 'rishi', age: 21 }]]  },
+//     {segment:[[{name: 'ravi1', age: 20},{ name: 'rishi1', age: 21 }]]  },
+//     {segment:[[{name: 'ravi2', age: 20},{ name: 'rishi2', age: 21 }]]  },
+//   ],
+//   [
+//     {segment:[[{name: 'jay', age: 20},{ name: 'kumar', age: 21 }]]  },
+//     {segment:[[{name: 'jay1', age: 20},{ name: 'kumar1', age: 21 }]]  },
+//     {segment:[[{name: 'ravi2', age: 20},{ name: 'rishi2', age: 21 }]]  },
+//   ],
+//   [
+//     {segment:[[{name: 'venky', age: 20},{ name: 'prathyusha', age: 21 }]]  },
+//     {segment:[[{name: 'venky1', age: 20},{ name: 'prathyusha1', age: 21 }]]  },
+//     {segment:[[{name: 'ravi2', age: 20},{ name: 'rishi2', age: 21 }]]  },
+//   ]
+// ]
 const FlightsRes = (props: any) => {
     const [expandedCardIndex, setExpandedCardIndex] = useState(null);
+    const {flightsData}=useSelector((state:RootState)=>state.flightReducer)
+    const data=flightsData.flat(1)
+    console.log(data)
+    const [showAll, setShowAll] = useState(Array(data.length).fill(false));
     const { destinationSelectedAirPort, departureformattedDate, originSelectedAirport, returnDate, departure, adults, children, infants, returnformattedDate, classes } = useSelector((state: RootState) => state.flightReducer)
     const travellers = adults + children + infants
-    const renderItem = ({ item, index }) => {
-        const isCardExpanded = index === expandedCardIndex;
-    
-        const renderObject = (object, objIndex) => (
-          <View key={objIndex} style={{ borderWidth: 1, padding: 10, margin: 5 }}>
-            <Text>Name: {object.name}</Text>
-            <Text>Age: {object.age}</Text>
-          </View>
-        );
-    
-        const renderViewAllButton = () => (
-          <TouchableOpacity onPress={() => setExpandedCardIndex(isCardExpanded ? null : index)}>
-            <View style={{ borderWidth: 1, padding: 10, margin: 5 }}>
-              <Text>{isCardExpanded ? 'Collapse' : 'View All'}</Text>
+
+    const handleSeeAll = (index) => {
+      setShowAll((prevShowAll) => {
+        const updatedShowAll = [...prevShowAll];
+        updatedShowAll[index] = !updatedShowAll[index];
+        return updatedShowAll;
+      });
+    }
+    const renderItem = ({ item, index }) =>{
+    //  console.log(item[0].Segments.flat(1).length,"ooooo")
+     const singleCard=item[0].Segments.flat(1)
+     console.log(singleCard[0].Airline.AirlineCode)
+    return (
+  
+      <View style={styles.cardContainer}>
+        {showAll[index] ? (
+          // If "See All" button is clicked, display all items in the array
+          item.map((obj, objIndex) => (
+            <View key={`${index}-${objIndex}`} >
+              {obj.Segments[0].map((person, personIndex) => (
+                console.log(person,"ravi")
+                // <View key={`${index}-${objIndex}-${personIndex}`}>
+                //   <Text>Name: {person.name}</Text>
+                //   <Text>Age: {person.age}</Text>
+                // </View>
+              ))}
             </View>
-          </TouchableOpacity>
-        );
-    
-        return (
-          <View>
-            {/* Display the first object of each sub-array */}
-            {renderObject(item[0], index)}
-    
-            {/* Display the remaining objects if the card is expanded */}
-            {isCardExpanded && (
-              <FlatList
-                data={item.slice(1)}
-                renderItem={({ item: object, index: objIndex }) => renderObject(object, objIndex)}
-                keyExtractor={(object, objIndex) => objIndex.toString()}
-              />
-            )}
-    
-            {/* Display "View All" button for each card */}
-            {renderViewAllButton()}
+          ))
+        ) : (
+          // Display only the first item in the array initially
+          <View key={`${index}-0`} style={{marginTop:20,paddingHorizontal:10}}>
+            {/* {item[0].Segments[0].map((person, personIndex) => (
+              // console.log(person.Airline,"single")
+              <View key={`${index}-0-${personIndex}`}>
+                <Text>Name: {person.Origin.Airport.AirportName}</Text>
+                <Text>Age: {person.age}</Text>
+              </View>
+            ))} */}
+          <FlightDataCard airlineCode={singleCard[0].Airline.AirlineCode} airlineName={singleCard[0].Airline.AirlineName} flightsNodata={singleCard}/>
+          
           </View>
-        );
-      };
+        )}
+        {/* {!showAll[index] && (
+          <Button title="See All" onPress={() => handleSeeAll(index)} />
+        )} */}
+      </View>
+    )}
     return (
         <View style={styles.mainContainer}>
             <View style={styles.headerContainer}>
@@ -79,12 +94,16 @@ const FlightsRes = (props: any) => {
                     <Text style={styles.descriptionTitles}>{classes}</Text>
                 </View>
             </View>
-            {/* data */}
-            <FlatList
-      data={data}
-      renderItem={renderItem}
-      keyExtractor={(item, index) => index.toString()}
-    />
+
+              {/*flightsRes */}
+
+            <View>
+           { data.length!==0&&<FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => String(index)}
+     contentContainerStyle={{paddingBottom:120}} />}
+            </View>
         </View>
     )
 }

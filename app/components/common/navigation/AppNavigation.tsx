@@ -14,7 +14,7 @@ const AuthNavigation=()=>
 {
   return(
     <Stack.Navigator screenOptions={{headerShown:false}}>
-    <Stack.Screen name="Splash" component={Dummy} />
+    <Stack.Screen name="Splash" component={Splash} />
     <Stack.Screen name="Login" component={Login} />
     <Stack.Screen name="CustomerBottomNavigation" component={CustomerBottomNavigation}/>
     <Stack.Screen name="OneWayFlights" component={FlightsRes} />

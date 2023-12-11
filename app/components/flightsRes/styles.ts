@@ -6,21 +6,27 @@ export const styles=StyleSheet.create({
         flex:1
     },
     headerContainer:{
-        paddingHorizontal:responsiveWidth(5),
+        paddingHorizontal:responsiveWidth(3),
         backgroundColor:colors.primary,
         paddingVertical:responsiveHeight(2),
-        rowGap:responsiveHeight(1.5)
+        rowGap:responsiveHeight(1.5),
+        borderWidth:1,
+       
     },
     header:{
         flexDirection:'row',
         alignItems:'center',
         columnGap:responsiveHeight(1.2),
         // paddingTop:responsiveHeight(2)
+        // justifyContent:'space-between',
+        // borderWidth:1,
+        //  paddingHorizontal:responsiveWidth(3),
+        
     },
     title:{
         fontFamily:fonts.primary,
         color:colors.white,
-        fontSize:responsiveFontSize(3)
+        fontSize:responsiveFontSize(2.8)
     },
     editButton:{
         backgroundColor:colors.highlight,
