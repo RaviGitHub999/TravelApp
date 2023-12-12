@@ -3,20 +3,35 @@ import React, { useEffect, useState } from 'react'
 import firestore from '@react-native-firebase/firestore';
 import { responsiveHeight, responsiveWidth } from '../../utils/responsiveScale';
 import IconSwitcher from '../common/icons/IconSwitcher';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+interface LogosData{
+    id:string,
+    url:string
+}[]
 interface IProps{
     airlineCode?:string,
     airlineName?:string,
-    flightsNodata:[]
+    flightsNumdata:[]
 }
-const FlightDataCard:React.FC<IProps> = ({airlineCode,airlineName,flightsNodata}) => {
-    useEffect(()=>
+const FlightDataCard:React.FC<IProps> = React.memo (({airlineCode,airlineName,flightsNumdata}) => {
+    const{originSelectedAirport,destinationSelectedAirPort}=useSelector((state:RootState)=>state.flightReducer)
+    const DepTime= flightsNumdata[0]?.Origin?.DepTime
+    const ArrTime=flightsNumdata[flightsNumdata.length-1].Destination.ArrTime
+    let travellingdays
+    console.log(DepTime,ArrTime)
+    const fn= flightsNumdata.map((ele:any,ind)=>
     {
-flightsNodata.map((ele:any)=>
-{
-  console.log(ele.Airline,"card")
-
-})
-    },[])
+    //    console.log(ele.Destination.ArrTime,"time")
+     return(
+<Text key={ind}>{ind > 0 && ', '}{`${ele.Airline.AirlineCode} - ${ele.Airline.FlightNumber} ${ele.Airline.FareClass}`}</Text>
+     )   
+    })
+    const flightSymbol=()=>
+    {         
+               const logo:LogosData[]= airlinelogos.filter((ele:{id:string})=>ele.id===airlineName?.toLowerCase())
+             return  logo[0]?.url
+    }
     var [airlinelogos, setAirlinelogos] = useState([]);
     const flightsLogos = async () => {
         await firestore().collection("airlinelogos").get().then((querySnapshot) => {
@@ -27,6 +42,35 @@ flightsNodata.map((ele:any)=>
             setAirlinelogos(updatedAirlinelogos)
         })
     }
+    const flightsTimings=(timestamp:string)=>
+    {
+return(
+    <Text>{timestamp.slice(timestamp.indexOf("T")+1,-3)}</Text>
+)
+    }
+    const totalTimeTravelling=(t1:string,t2:string)=>
+    {
+        const time1= new Date(t1);
+        const time2= new Date(t2);
+        const timeDifferenceMillis = Math.abs(time2.getTime() - time1.getTime());
+        const daysDifference = Math.floor(timeDifferenceMillis / (1000 * 60 * 60 * 24));
+        travellingdays=daysDifference
+        // Convert the time difference to hours and minutes
+        if(flightsNumdata.length>1)
+        {
+const totalMinutes=flightsNumdata[1]?.AccumulatedDuration
+const hours = Math.floor(totalMinutes / 60);
+const minutes = totalMinutes % 60;
+return <Text>{`${hours} h ${minutes} m`}</Text>
+        }
+        else{
+        const hours = Math.floor(timeDifferenceMillis / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifferenceMillis % (1000 * 60 * 60)) / (1000 * 60));
+        return <Text>{`${hours} h ${minutes} m`}</Text>
+        }
+       
+       
+    }
     useEffect(() => {
         flightsLogos()
     }, [])
@@ -34,24 +78,27 @@ flightsNodata.map((ele:any)=>
         <View style={styles.mainContainer}>
 
             <View style={styles.logoHeader}>
-                <View style={styles.flightLogoContainer}><Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/trav-biz.appspot.com/o/airline_logos%2Fthai-airways.png?alt=media&token=e2508860-8386-42d2-ba87-8a6518883b53" }} style={styles.flightLogo} resizeMode='contain' /></View>
+                <View style={styles.flightLogoContainer}>{flightSymbol() ? (
+                        <Image source={{ uri: flightSymbol() }} style={styles.flightLogo} resizeMode='contain' />
+                    ) : null}</View>
                 <Text>{`${airlineName}`}</Text>
-                <Text>{`(${airlineCode} - ${7741} PR, 6E - 46 LR)`}</Text>
+                <Text>({fn})</Text>
             </View>
 
             <View style={styles.flightsTimingContainer}>
                 <View >
-                    <Text>20:15</Text>
-                    <Text>HYD</Text>
+                {flightsTimings(DepTime)}
+                    <Text>{originSelectedAirport.iataCode}</Text>
                 </View>
                 <View style={styles.directionContainer} >
-                    <Text style={{ textAlign: 'center' }}>Direct</Text>
+                    <Text style={{ textAlign: 'center' }}>{flightsNumdata.length>1?`${flightsNumdata.length-1} Stop`:"Direct"}</Text>
                     <View style={{ borderTopWidth: 1, borderStyle: "dashed" }}></View>
-                    <Text style={{ textAlign: 'center' }}>5h 11m</Text>
+                    <Text style={{ textAlign: 'center' }}> {totalTimeTravelling(DepTime,ArrTime)}</Text>
                 </View>
                 <View>
-                    <Text>20:15</Text>
-                    <Text>HYD</Text>
+                    <Text>{travellingdays!==0&&`${travellingdays} days`}</Text>
+                       {flightsTimings(ArrTime)}
+                    <Text>{destinationSelectedAirPort.iataCode}</Text>
                 </View>
             </View>
 
@@ -73,7 +120,7 @@ flightsNodata.map((ele:any)=>
             </View>
         </View>
     )
-}
+})
 
 export default FlightDataCard
 const styles = StyleSheet.create({
@@ -85,14 +132,14 @@ const styles = StyleSheet.create({
         borderRadius:responsiveHeight(2)
     },
     flightLogoContainer: {
-        height: responsiveHeight(5),
-        width: responsiveHeight(5),
+        height: responsiveHeight(4),
+        width: responsiveHeight(4),
         alignItems: 'center',
         justifyContent: "center",
     },
     flightLogo: {
-        height: responsiveHeight(10),
-        width: responsiveWidth(10),
+        height: responsiveHeight(7),
+        width: responsiveWidth(7),
     },
     logoHeader: {
         flexDirection: "row",

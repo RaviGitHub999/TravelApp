@@ -495,7 +495,6 @@ state.journeyWay=action.payload
             });
 
             builder.addCase(flightSearching.fulfilled, (state, action) => {
-                console.log(action.payload.flightResult.Response.Results,"data")
                 state.flightsData=action.payload.flightResult.Response.Results,
                 state.flightSearchLoading=false
             });
