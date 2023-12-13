@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import firestore from '@react-native-firebase/firestore';
 import { responsiveHeight, responsiveWidth } from '../../utils/responsiveScale';
 import IconSwitcher from '../common/icons/IconSwitcher';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { colors } from '../../config/theme';
 interface LogosData{
     id:string,
     url:string
@@ -15,10 +16,10 @@ interface IProps{
     flightsNumdata:[]
 }
 const FlightDataCard:React.FC<IProps> = React.memo (({airlineCode,airlineName,flightsNumdata}) => {
+    const [modalVisible, setModalVisible] = useState(false);
     const{originSelectedAirport,destinationSelectedAirPort}=useSelector((state:RootState)=>state.flightReducer)
     const DepTime= flightsNumdata[0]?.Origin?.DepTime
     const ArrTime=flightsNumdata[flightsNumdata.length-1].Destination.ArrTime
-    let travellingdays
     console.log(DepTime,ArrTime)
     const fn= flightsNumdata.map((ele:any,ind)=>
     {
@@ -48,35 +49,87 @@ return(
     <Text>{timestamp.slice(timestamp.indexOf("T")+1,-3)}</Text>
 )
     }
+const eachFlighttotalTimeTravelling=(t1:string,t2:string)=>
+{
+    const time1= new Date(t1);
+    const time2= new Date(t2);
+    const timeDifferenceMillis = Math.abs(time2.getTime() - time1.getTime());
+    const hours = Math.floor(timeDifferenceMillis / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDifferenceMillis % (1000 * 60 * 60)) / (1000 * 60));
+    return <Text>{`${hours} h ${minutes} m`}</Text>
+}
+
+
+
+
+
     const totalTimeTravelling=(t1:string,t2:string)=>
     {
         const time1= new Date(t1);
         const time2= new Date(t2);
         const timeDifferenceMillis = Math.abs(time2.getTime() - time1.getTime());
-        const daysDifference = Math.floor(timeDifferenceMillis / (1000 * 60 * 60 * 24));
-        travellingdays=daysDifference
+        // const daysDifference = Math.floor(timeDifferenceMillis / (1000 * 60 * 60 * 24));
+        // travellingdays=daysDifference
         // Convert the time difference to hours and minutes
         if(flightsNumdata.length>1)
         {
-const totalMinutes=flightsNumdata[1]?.AccumulatedDuration
+const totalMinutes=flightsNumdata[flightsNumdata.length-1]?.AccumulatedDuration
 const hours = Math.floor(totalMinutes / 60);
 const minutes = totalMinutes % 60;
-return <Text>{`${hours} h ${minutes} m`}</Text>
+return <Text>{`${hours}h`} {minutes>0?`${minutes}m`:null}</Text>
         }
         else{
         const hours = Math.floor(timeDifferenceMillis / (1000 * 60 * 60));
         const minutes = Math.floor((timeDifferenceMillis % (1000 * 60 * 60)) / (1000 * 60));
-        return <Text>{`${hours} h ${minutes} m`}</Text>
+        return <Text>{`${hours}h`} {minutes>0?`${minutes}m`:null}{minutes>0?`${minutes}m`:null}</Text>
         }
        
        
     }
+    const formatDaysDifference=(departureDateTime:string,arrivalDateTime:string)=>
+    {
+        const departureDate= new Date(departureDateTime);
+        const arrivalDate= new Date(arrivalDateTime);
+        const timeDifference = arrivalDate - departureDate;
+        const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+        if (daysDifference >= 1) {
+            return <Text>{`${daysDifference}${daysDifference>1?"days":"day"}`}</Text>
+        } 
+    }
+    const flightRoute=flightsNumdata.map((ele:any,ind)=>
+        {
+            const DepTime=ele.Origin.DepTime;
+            const ArrTime=ele.Destination.ArrTime
+           return(
+            <View key={ele?.Airline.FlightNumber} >
+               <View style={{flexDirection:'row',justifyContent:"space-between",marginBottom:10,backgroundColor:"purple",padding:12,borderRadius:15,alignContent:'center'}}>
+               <View >
+                   {flightsTimings(DepTime)}
+                    <Text>{ele.Origin.Airport.AirportCode}</Text>
+                </View>
+                <View style={{justifyContent:'center',width:"50%"}}>
+                    <View style={{borderBottomWidth:1,borderStyle:"dashed"}}></View>
+                    <Text style={{textAlign:'center'}}>{eachFlighttotalTimeTravelling(DepTime,ArrTime)}</Text>
+                </View>
+                <View>
+                {flightsTimings(ArrTime)}
+                    <Text>{ele.Destination.Airport.AirportCode}</Text>
+                </View>
+               </View>
+               {flightsNumdata.length > 1 && ind < flightsNumdata.length - 1 && <View><Text>LayOver For </Text></View>}
+    
+            </View>
+           )
+        })
+        
+    
+    
     useEffect(() => {
         flightsLogos()
     }, [])
     return (
         <View style={styles.mainContainer}>
-
+      
             <View style={styles.logoHeader}>
                 <View style={styles.flightLogoContainer}>{flightSymbol() ? (
                         <Image source={{ uri: flightSymbol() }} style={styles.flightLogo} resizeMode='contain' />
@@ -91,12 +144,15 @@ return <Text>{`${hours} h ${minutes} m`}</Text>
                     <Text>{originSelectedAirport.iataCode}</Text>
                 </View>
                 <View style={styles.directionContainer} >
-                    <Text style={{ textAlign: 'center' }}>{flightsNumdata.length>1?`${flightsNumdata.length-1} Stop`:"Direct"}</Text>
+                   <TouchableOpacity onPress={()=>setModalVisible(true)}>
+                   <Text style={{ textAlign: 'center' }}>{flightsNumdata.length>1?`${flightsNumdata.length-1} ${flightsNumdata.length>1?"Stop":"Stops"}`:"Direct"}</Text>
+                   </TouchableOpacity>
                     <View style={{ borderTopWidth: 1, borderStyle: "dashed" }}></View>
                     <Text style={{ textAlign: 'center' }}> {totalTimeTravelling(DepTime,ArrTime)}</Text>
                 </View>
                 <View>
-                    <Text>{travellingdays!==0&&`${travellingdays} days`}</Text>
+                    {/* <Text>{travellingdays!==0&&`${travellingdays} days`}</Text> */}
+                  {  formatDaysDifference(DepTime,ArrTime)}
                        {flightsTimings(ArrTime)}
                     <Text>{destinationSelectedAirPort.iataCode}</Text>
                 </View>
@@ -118,6 +174,16 @@ return <Text>{`${hours} h ${minutes} m`}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
+            <Modal  animationType="slide"
+        transparent={true}
+        visible={modalVisible}>
+         <View style={{justifyContent:'center',height:'100%',paddingHorizontal:10}}>
+         <View style={{backgroundColor:colors.white,padding:responsiveHeight(3),borderRadius:responsiveHeight(3)}}>
+            <TouchableOpacity style={{alignItems:'flex-end'}} onPress={()=>setModalVisible(false)}><IconSwitcher componentName='Entypo' iconName='cross' color={colors.black} iconsize={3}/></TouchableOpacity>
+         {flightRoute}
+         </View>
+         </View>
+            </Modal>
         </View>
     )
 })
