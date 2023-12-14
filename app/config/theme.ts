@@ -20,7 +20,9 @@ export const fonts = {
     google:"#df4a32",
     white:"#FFFFFF",
     black:"#000000",
-    lightGray:"#505050"
+    lightGray:"#505050",
+    red:"red",
+    gray:"#A6A39E"
   };
  
   export const darkTheme = {
@@ -34,7 +36,9 @@ export const fonts = {
     google:"#df4a32",
      white:"#FFFFFF",
     black:"#000000",
-    lightGray:"#505050"
+    lightGray:"#505050",
+    red:"red",
+    gray:"#A6A39E"
    
   };
   

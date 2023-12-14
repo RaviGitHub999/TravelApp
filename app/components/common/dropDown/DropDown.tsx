@@ -5,6 +5,7 @@ import { responsiveHeight, responsiveWidth } from '../../../utils/responsiveScal
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../redux/store'
 import  { handleDropDownState } from '../../../redux/reducers/flightSearch'
+import { colors } from '../../../config/theme'
 interface IProps {
     length: number,
     particularState:string
@@ -45,7 +46,7 @@ const DropDown: React.FC<IProps> = ({ length,particularState }) => {
     }
     return (
         <View >
-            <TouchableOpacity style={{ backgroundColor: '#f6f6f6', rowGap: responsiveHeight(1), borderWidth: 1, paddingHorizontal: responsiveWidth(2.5), borderRadius: responsiveHeight(1.5), paddingVertical: responsiveHeight(0.5),width:responsiveWidth(24)}} onPress={handleDropDownIcon}>
+            <TouchableOpacity style={{ backgroundColor: "#f4edf9", rowGap: responsiveHeight(1), borderWidth: 1, paddingHorizontal: responsiveWidth(2.5), borderRadius: responsiveHeight(1.5), paddingVertical: responsiveHeight(0.5),width:responsiveWidth(24)}} onPress={handleDropDownIcon}>
                 <View>
                     <Text>{particularState}</Text>
                 </View>

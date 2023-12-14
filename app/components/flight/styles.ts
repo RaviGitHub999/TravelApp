@@ -5,28 +5,25 @@ import { colors, fonts } from "../../config/theme";
 export const styles = StyleSheet.create({
     mainConatiner: {
         flex: 1,
-        // justifyContent: 'center'
     },
     subContainer: {
-        paddingHorizontal: responsiveWidth(5),
-        paddingVertical:responsiveHeight(3),
-        backgroundColor:colors.highlight,
-        borderRadius:responsiveHeight(2),borderWidth:2,
-        flex:1/1.3,
+        flex:1,
     },
     btnsContainer: {
         marginRight:responsiveWidth(5),
         borderWidth:1,
         paddingHorizontal:responsiveWidth(4),
         paddingVertical:responsiveHeight(1),
-        borderRadius:responsiveHeight(3),
-        // marginTop:responsiveHeight(2)
+        borderRadius:responsiveHeight(3)
     },
     active:{
 backgroundColor:colors.primary
     },
     activeText:{
         color:colors.white
+    },
+    btnContainer:{
+     marginTop:responsiveHeight(3),
     },
     btnTitle:{
         fontSize:responsiveFontSize(2.1),
@@ -51,5 +48,8 @@ backgroundColor:colors.primary
     },
     airportName:{
         fontSize:responsiveFontSize(1.6)
+    },
+    searchFlightsBtnConatainer:{
+        marginBottom:responsiveHeight(5)
     }
 })

@@ -10,23 +10,17 @@ export const styles=StyleSheet.create({
         backgroundColor:colors.primary,
         paddingVertical:responsiveHeight(2),
         rowGap:responsiveHeight(1.5),
-        borderWidth:1,
-       
     },
     header:{
         flexDirection:'row',
         alignItems:'center',
         columnGap:responsiveHeight(1.2),
-        // paddingTop:responsiveHeight(2)
-        // justifyContent:'space-between',
-        // borderWidth:1,
-        //  paddingHorizontal:responsiveWidth(3),
-        
     },
     title:{
         fontFamily:fonts.primary,
         color:colors.white,
-        fontSize:responsiveFontSize(2.8)
+        fontSize:responsiveFontSize(2.8),
+        width:"90%"
     },
     editButton:{
         backgroundColor:colors.highlight,
@@ -43,5 +37,17 @@ export const styles=StyleSheet.create({
 color:colors.white,
 fontSize:responsiveFontSize(2),
 fontFamily:fonts.textFont
-    }
+    },
+    activeIndicatorMainContainer:{
+        flex:1
+    },
+    activeIndicator:{ 
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+}
 })

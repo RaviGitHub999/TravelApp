@@ -103,8 +103,8 @@ if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.ci
 
   return (
     <View style={styles.subContainer}>
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} >
-        <FlatList data={btns} renderItem={handleRender} keyExtractor={item => item.journeyType} horizontal />
+      <ScrollView style={{ flex: 1}} showsVerticalScrollIndicator={false} >
+        <FlatList data={btns} renderItem={handleRender} keyExtractor={item => item.journeyType} horizontal style={styles.btnContainer}/>
         <View style={styles.fieldsContainer}>
           <SearchInputs btn={false} dropDown={false} placeholder='Origin' handleChangeText={handleChange} Value={origin} stateName="origin" selectedObj={originSelectedAirport} selected={originselected} />
           {
@@ -146,13 +146,15 @@ if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.ci
             <SearchInputs datePick='departure' btn={true} dropDown={false} placeholder={departure}{...active === "Round Trip" && { customStyles: { width: responsiveWidth(41) } }} handleDatePicker={handleOpenCalender} />
             {active === "Round Trip" && <SearchInputs datePick="return" btn={true} dropDown={false} placeholder={returnDate} customStyles={{ width: responsiveWidth(41) }} handleDatePicker={handleOpenReturnCalender} />}
           </View>
-          <View style={{ flexDirection: "row", justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: "row", justifyContent: 'space-evenly' }}>
             <DropDown length={10} particularState='adults' />
             <DropDown length={9} particularState='children' />
             <DropDown length={9} particularState='infants' />
           </View>
           <SearchInputs btn={true} dropDown={true} placeholder='Origin' />
-          <CustomButton title='Search Flight' handleSubmit={handleSearch} />
+         <View style={styles.searchFlightsBtnConatainer}>
+         <CustomButton title='Search Flight' handleSubmit={handleSearch} />
+         </View>
         </View>
         {calenderOpen.departureCalender && <DateTimePicker
           value={dateValue}

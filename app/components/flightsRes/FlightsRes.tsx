@@ -22,11 +22,12 @@ const FlightsRes = (props: any) => {
         return updatedShowAll;
       });
     }
-    const MyListItem =  React.memo(({ item, index }:{item:any,index:any}) =>{
+    const MyListItem =  React.memo(({ item, index }:{item:any,index:number}) =>{
      const singleCard=item[0].Segments.flat(1)
+     const farePrice=item[0].Fare.OfferedFare
     return (
           <View key={`${index}-0`} style={{marginTop:20,paddingHorizontal:10}}>
-          <FlightDataCard airlineCode={singleCard[0].Airline.AirlineCode} airlineName={singleCard[0].Airline.AirlineName} flightsNumdata={singleCard}/>
+          <FlightDataCard airlineCode={singleCard[0].Airline.AirlineCode} airlineName={singleCard[0].Airline.AirlineName} flightsNumdata={singleCard} price={farePrice}/>
           </View>
     )})
     return (
@@ -48,8 +49,8 @@ const FlightsRes = (props: any) => {
 
               {/*flightsRes */}
 
-            <View>
-           {flightSearchLoading?<ActivityIndicator size={responsiveHeight(10)} color={colors.facebook}/>:<FlatList
+            <View style={styles.activeIndicatorMainContainer}>
+           {flightSearchLoading?<ActivityIndicator size={responsiveHeight(5)} color={colors.facebook} style={styles.activeIndicator}/>:flightsData.length===0?<Text>No data</Text>:<FlatList
         data={data}
         renderItem={({ item ,index}) => <MyListItem item={item} index={index} />}
         keyExtractor={(item, index) => String(index)}
