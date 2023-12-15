@@ -3,17 +3,16 @@ import React, { useEffect, useState } from 'react'
 import firestore from '@react-native-firebase/firestore';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from '../../utils/responsiveScale';
 import IconSwitcher from '../common/icons/IconSwitcher';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { colors, fonts } from '../../config/theme';
+import { handleViewAllFlights } from '../../redux/reducers/flightSearch';
+import RemainingFlights from './RemainingFlights';
 interface LogosData {
     id: string,
     url: string
 }[]
 interface IProps {
-    
-    airlineCode?: string,
-    airlineName?: string,
     flightsNumdata:{
         Airline:{
             AirlineCode: string,
@@ -36,11 +35,16 @@ interface IProps {
         },
         GroundTime:number
     } [],
-    price: number
+    price: number,
+    singleItem:any
 }
-const FlightDataCard: React.FC<IProps> = React.memo(({ airlineCode, airlineName, flightsNumdata, price }) => {
+const FlightDataCard: React.FC<IProps> = React.memo(({flightsNumdata, price,singleItem }) => {
+    console.log(singleItem)
+   const dispatch=useDispatch()
     const [modalVisible, setModalVisible] = useState(false);
-    const { originSelectedAirport, destinationSelectedAirPort } = useSelector((state: RootState) => state.flightReducer)
+    const[viewAll,setViewAll]=useState(false)
+    const { originSelectedAirport, destinationSelectedAirPort ,airlinelogos} = useSelector((state: RootState) => state.flightReducer)
+    const airlineName=flightsNumdata[0].Airline.AirlineName
     const DepTime = flightsNumdata[0]?.Origin?.DepTime
     const ArrTime = flightsNumdata[flightsNumdata.length - 1].Destination.ArrTime
     const fn = flightsNumdata.map((ele: any, ind) => {
@@ -51,16 +55,6 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ airlineCode, airlineName,
     const flightSymbol = () => {
         const logo: LogosData[] = airlinelogos.filter((ele: { id: string }) => ele.id === airlineName?.toLowerCase())
         return logo[0]?.url
-    }
-    var [airlinelogos, setAirlinelogos] = useState([]);
-    const flightsLogos = async () => {
-        await firestore().collection("airlinelogos").get().then((querySnapshot) => {
-            let updatedAirlinelogos: any = [];
-            querySnapshot.forEach(snapshot => {
-                updatedAirlinelogos.push({ id: snapshot.id, url: snapshot.data().url });
-            })
-            setAirlinelogos(updatedAirlinelogos)
-        })
     }
     const flightsTimings = (timestamp: string) => { return <Text>{timestamp.slice(timestamp.indexOf("T") + 1, -3)}</Text> }
     const eachFlighttotalTimeTravelling = (t1: string, t2: string) => {
@@ -140,15 +134,17 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ airlineCode, airlineName,
         });
         return formattedNumber.slice(0, formattedNumber.indexOf("."))
     }
-    useEffect(() => {
-        flightsLogos()
-    }, [])
+    const du=()=>
+    {
+        // dispatch(handleViewAllFlights(singleItem))
+        setViewAll(true)
+    }
     return (
         <View style={styles.mainContainer}>
             <View style={styles.logoHeader}>
                 <View style={styles.flightLogoContainer}>{flightSymbol() ? (
                     <Image source={{ uri: flightSymbol() }} style={styles.flightLogo} resizeMode='contain' />
-                ) : null}</View>
+                ) : <IconSwitcher componentName='FontAwesome5' iconName='plane-departure' iconsize={3}/>}</View>
                 <Text style={styles.airlineName}>{`${airlineName}`}</Text>
                <View style={{width:"60%"}}>
                <Text style={styles.flightNumbers}>({fn})</Text>
@@ -198,6 +194,8 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ airlineCode, airlineName,
                     </View>
                 </View>
             </Modal>
+            <TouchableOpacity style={{alignItems:'center'}} onPress={du}><Text style={{color:colors.facebook}}>View All</Text></TouchableOpacity>
+            {<RemainingFlights/>}
         </View>
     )
 })

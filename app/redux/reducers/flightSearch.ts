@@ -3,31 +3,33 @@ import Fuse from 'fuse.js';
 import AirportsData from "../../components/jsonData/Airports.json"
 import axios, { CancelTokenSource } from "axios";
 import networkCall from "../../utils/networkCall";
-interface NetworkState{
-getState:Function,
-fulfillWithValue:Function,
-rejectWithValue:Function
+import firestore from '@react-native-firebase/firestore';
+import { ActionSheetIOS } from "react-native";
+interface NetworkState {
+    getState: Function,
+    fulfillWithValue: Function,
+    rejectWithValue: Function
 }
-export interface SelectedFlightObj{
+export interface SelectedFlightObj {
     name: string;
     iataCode: string;
     address: { cityName: string; countryName: string }
 }
-interface FlightSearchParameters{
-    adults:number,
+interface FlightSearchParameters {
+    adults: number,
     child: number,
     infant: number,
-    directFlight:boolean ,
-    oneStopFlight:boolean,
-    journeyType:string,
+    directFlight: boolean,
+    oneStopFlight: boolean,
+    journeyType: string,
     preferredAirlines: null,
     sources: null,
-    segments:{
-        Origin:SelectedFlightObj,
-        Destination:SelectedFlightObj,
-        FlightCabinClass:string,
-        PreferredDepartureTime:Date ,
-        PreferredArrivalTime:Date , 
+    segments: {
+        Origin: SelectedFlightObj,
+        Destination: SelectedFlightObj,
+        FlightCabinClass: string,
+        PreferredDepartureTime: Date,
+        PreferredArrivalTime: Date,
     }[]
 }
 interface InitialState {
@@ -40,7 +42,7 @@ interface InitialState {
     infants: number,
     classes: string,
     directflight: boolean,
-    oneStopFlight:boolean,
+    oneStopFlight: boolean,
     dateValue: Date,
     returnDateValue: Date,
     airportOriginData: SelectedFlightObj[],
@@ -51,16 +53,20 @@ interface InitialState {
     destinationSelectedAirPort: SelectedFlightObj,
     airportDestinationData: SelectedFlightObj[],
     airportDestinationLoading: boolean,
-    originselected:boolean,
-    destinationselected:boolean,
-    journeyWay:string,
-    outbound:string,
-    inbound:string,
-    cabinClassId:string,
-    departureformattedDate:string,
-    returnformattedDate:string,
-    flightsData:any[],
-    flightSearchLoading:boolean
+    originselected: boolean,
+    destinationselected: boolean,
+    journeyWay: string,
+    outbound: string,
+    inbound: string,
+    cabinClassId: string,
+    departureformattedDate: string,
+    returnformattedDate: string,
+    flightsData: any[],
+    flightSearchLoading: boolean,
+    airlinelogos: [],
+    status: string,
+    error: any,
+    RemainingFlights:any
 }
 const initialState: InitialState = {
     origin: "",
@@ -72,14 +78,14 @@ const initialState: InitialState = {
     infants: 0,
     classes: "Economy",
     directflight: false,
-    oneStopFlight:false, 
+    oneStopFlight: false,
     dateValue: new Date(),
     returnDateValue: new Date(),
     airportOriginData: [],
     airportOriginLoading: false,
     desRes: false,
     oriRes: false,
-    originSelectedAirport:{
+    originSelectedAirport: {
         name: "",
         iataCode: "",
         address: {
@@ -97,16 +103,20 @@ const initialState: InitialState = {
     },
     airportDestinationData: [],
     airportDestinationLoading: false,
-    originselected:false,
-    destinationselected:false,
-    journeyWay:"1",
-    outbound:"",
-    inbound:"",
-    cabinClassId:"1",
-    departureformattedDate:"",
-    returnformattedDate:"",
-    flightsData:[],
-    flightSearchLoading:false
+    originselected: false,
+    destinationselected: false,
+    journeyWay: "1",
+    outbound: "",
+    inbound: "",
+    cabinClassId: "1",
+    departureformattedDate: "",
+    returnformattedDate: "",
+    flightsData: [],
+    flightSearchLoading: false,
+    airlinelogos: [],
+    status: 'idle',
+    error: null,
+    RemainingFlights:[]
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -256,82 +266,79 @@ export const debouncedSearchDestinationAirport = debounce((dispatch: any, getSta
         dispatch(flightSearch.actions.handleairportDestinationLoading())
     }
 }, 500);
-export const flightSearching=createAsyncThunk("fetching Flights Data",async(_,{getState,fulfillWithValue,rejectWithValue}:NetworkState)=>
-{
+export const flightSearching = createAsyncThunk("fetching Flights Data", async (_, { getState, fulfillWithValue, rejectWithValue }: NetworkState) => {
 
-    const {outbound,inbound,cabinClassId,oneStopFlight,originSelectedAirport,destinationSelectedAirPort,journeyWay,adults,children,infants,directflight}=getState().flightReducer
-    let request:any = {
-       adults,
-       child: children,
-       infant: infants,
-       directFlight: directflight,
-       oneStopFlight,
-       journeyType: journeyWay,
-       preferredAirlines: null,
-       sources: null,
-       segments: []
-   };
-   var segments: { Origin: any; Destination: any; FlightCabinClass: any; PreferredDepartureTime: any; PreferredArrivalTime: any; }[] = [];
-if(journeyWay==="2"){
-    segments = [
-        {
-          Origin:originSelectedAirport.iataCode,
-          Destination:destinationSelectedAirPort.iataCode,
-          FlightCabinClass:cabinClassId,
-          PreferredDepartureTime:outbound,
-          PreferredArrivalTime:outbound ,
-        },
-        {
-            Origin:originSelectedAirport.iataCode,
-            Destination:destinationSelectedAirPort.iataCode,
-            FlightCabinClass:cabinClassId,
-            PreferredDepartureTime:inbound,
-            PreferredArrivalTime:inbound ,
-          }
-      ];
-}else{
-    segments = [
-        {
-          Origin:originSelectedAirport.iataCode,
-          Destination:destinationSelectedAirPort.iataCode,
-          FlightCabinClass:cabinClassId,
-          PreferredDepartureTime:outbound,
-          PreferredArrivalTime:outbound ,
-        }
-      ];
-}
-      request.segments=segments
-      console.log("Search req", request);
-      const data= JSON.stringify(request)
-      const {response,error}= await networkCall(
+    const { outbound, inbound, cabinClassId, oneStopFlight, originSelectedAirport, destinationSelectedAirPort, journeyWay, adults, children, infants, directflight } = getState().flightReducer
+    let request: any = {
+        adults,
+        child: children,
+        infant: infants,
+        directFlight: directflight,
+        oneStopFlight,
+        journeyType: journeyWay,
+        preferredAirlines: null,
+        sources: null,
+        segments: []
+    };
+    var segments: { Origin: any; Destination: any; FlightCabinClass: any; PreferredDepartureTime: any; PreferredArrivalTime: any; }[] = [];
+    if (journeyWay === "2") {
+        segments = [
+            {
+                Origin: originSelectedAirport.iataCode,
+                Destination: destinationSelectedAirPort.iataCode,
+                FlightCabinClass: cabinClassId,
+                PreferredDepartureTime: outbound,
+                PreferredArrivalTime: outbound,
+            },
+            {
+                Origin: originSelectedAirport.iataCode,
+                Destination: destinationSelectedAirPort.iataCode,
+                FlightCabinClass: cabinClassId,
+                PreferredDepartureTime: inbound,
+                PreferredArrivalTime: inbound,
+            }
+        ];
+    } else {
+        segments = [
+            {
+                Origin: originSelectedAirport.iataCode,
+                Destination: destinationSelectedAirPort.iataCode,
+                FlightCabinClass: cabinClassId,
+                PreferredDepartureTime: outbound,
+                PreferredArrivalTime: outbound,
+            }
+        ];
+    }
+    request.segments = segments
+    console.log("Search req", request);
+    const data = JSON.stringify(request)
+    const { response, error } = await networkCall(
         "https://us-central1-tripfriday-2b399.cloudfunctions.net/tboApi/flightSearch",
         "POST",
         data,
-      );
-      if(response)
-      {
+    );
+    if (response) {
         return fulfillWithValue(response)
-      }
-      else{
+    }
+    else {
         return rejectWithValue(error)
-      }
+    }
 
 })
 
+export const fetchFlightsLogos = createAsyncThunk(
+    'flightsLogos/fetchFlightsLogos',
+    async () => {
+        const querySnapshot = await firestore().collection("airlinelogos").get();
+        let updatedAirlinelogos: any = [];
 
+        querySnapshot.forEach(snapshot => {
+            updatedAirlinelogos.push({ id: snapshot.id, url: snapshot.data().url });
+        });
 
-
-
-
-
-
-
-
-
-
-
-
-
+        return updatedAirlinelogos;
+    }
+);
 
 export const flightSearch = createSlice(
     {
@@ -350,13 +357,13 @@ export const flightSearch = createSlice(
                             return "6";
                         case "Premium Economy":
                             return "3";
-                            case "Any cabin class":
+                        case "Any cabin class":
                             return "1";
                         default:
                             return "1";
                     }
                 })();
-state.cabinClassId=classId
+                state.cabinClassId = classId
 
             },
             handleDropDownState: (state, action) => {
@@ -382,11 +389,11 @@ state.cabinClassId=classId
                         day: 'numeric',
                     });
                     state.departure = formattedDate,
-                    state.departureformattedDate=formattedDate,
-                    state.dateValue=action.payload
-                const inputDate = new Date(action.payload);
-                const dateString =  inputDate.toISOString();
-                state.outbound=`${dateString.split("").slice(0,dateString.indexOf("T")+1).join("")}00:00:00`
+                        state.departureformattedDate = formattedDate,
+                        state.dateValue = action.payload
+                    const inputDate = new Date(action.payload);
+                    const dateString = inputDate.toISOString();
+                    state.outbound = `${dateString.split("").slice(0, dateString.indexOf("T") + 1).join("")}00:00:00`
                 }
             },
             handleReturnDateChange: (state, action) => {
@@ -397,12 +404,12 @@ state.cabinClassId=classId
                         day: 'numeric',
                     });
                     state.returnDate = formattedDate,
-                    state.returnformattedDate=formattedDate
-                    state.returnDateValue=action.payload
+                        state.returnformattedDate = formattedDate
+                    state.returnDateValue = action.payload
                     const inputDate = new Date(action.payload);
-                const dateString =  inputDate.toISOString();
-                state.inbound=`${dateString.split("").slice(0,dateString.indexOf("T")+1).join("")}00:00:00`
-                    
+                    const dateString = inputDate.toISOString();
+                    state.inbound = `${dateString.split("").slice(0, dateString.indexOf("T") + 1).join("")}00:00:00`
+
                 }
             },
             handleChangeOriginTextInput: (state, action) => {
@@ -448,7 +455,7 @@ state.cabinClassId=classId
                     originSelectedAirport: action.payload,
                     oriRes: !state.oriRes,
                     origin: '',
-                    originselected:true
+                    originselected: true
                 }
             },
             handleDestinationSelectedAirPort: (state, action) => {
@@ -457,13 +464,21 @@ state.cabinClassId=classId
                     destinationSelectedAirPort: action.payload,
                     desRes: !state.desRes,
                     destination: '',
-                    destinationselected:true
+                    destinationselected: true
                 }
             },
-            handleJourneyWay:(state,action)=>
-            {
-state.journeyWay=action.payload
+            handleJourneyWay: (state, action) => {
+                state.journeyWay = action.payload
             },
+            handleViewAllFlights: (state,action) => 
+            {
+                console.log(action.payload)
+                const data=state.flightsData.flat(1)
+const item=data.filter((ele,ind)=>ind===action.payload)
+state.RemainingFlights=item.flat(1)
+console.log("hiuu")  
+            }
+              
         },
 
         extraReducers: (builder) => {
@@ -495,21 +510,32 @@ state.journeyWay=action.payload
             });
 
             builder.addCase(flightSearching.fulfilled, (state, action) => {
-                state.flightsData=action.payload.flightResult.Response.Results,
-                state.flightSearchLoading=false
+                state.flightsData = action.payload.flightResult.Response.Results,
+                    state.flightSearchLoading = false
             });
 
             builder.addCase(flightSearching.pending, (state) => {
-                state.flightSearchLoading=true
+                state.flightSearchLoading = true
                 console.log("pending")
             });
 
             builder.addCase(flightSearching.rejected, (state) => {
-                state.flightSearchLoading=false
-                state.flightsData=[]
+                state.flightSearchLoading = false
+                state.flightsData = []
                 console.log("rejected")
             });
-
+            builder
+                .addCase(fetchFlightsLogos.pending, (state) => {
+                    state.status = 'loading';
+                })
+                .addCase(fetchFlightsLogos.fulfilled, (state, action) => {
+                    state.status = 'succeeded';
+                    state.airlinelogos = action.payload;
+                })
+                .addCase(fetchFlightsLogos.rejected, (state, action) => {
+                    state.status = 'failed';
+                    state.error = action.error.message;
+                });
 
 
         },
@@ -520,7 +546,7 @@ export const selectOriginWithDebounce = (query: string) => (dispatch: any, getSt
 export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
     debouncedSearchDestinationAirport(dispatch, getState, query)
 }
-export const { handleClass,handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput,handleJourneyWay} = flightSearch.actions
+export const { handleClass, handleDropDownState,handleViewAllFlights, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
 export default flightSearch.reducer
 
 

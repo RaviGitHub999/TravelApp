@@ -1,20 +1,26 @@
 import { View, Text, TouchableOpacity,FlatList, Button, ActivityIndicator} from 'react-native'
-import React ,{useState} from 'react'
+import React ,{useEffect, useState} from 'react'
 import { styles } from './styles'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../redux/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../../redux/store'
 import IconSwitcher from '../common/icons/IconSwitcher'
 import { colors } from '../../config/theme'
 import FlightDataCard from './FlightDataCard'
 import { responsiveHeight } from '../../utils/responsiveScale'
+import { fetchFlightsLogos } from '../../redux/reducers/flightSearch'
+import RemainingFlights from './RemainingFlights'
 const FlightsRes = (props: any) => {
     const [expandedCardIndex, setExpandedCardIndex] = useState(null);
+    const dispatch:AppDispatch=useDispatch()
     const {flightsData,flightSearchLoading}=useSelector((state:RootState)=>state.flightReducer)
     const data=flightsData.flat(1)
     const [showAll, setShowAll] = useState(Array(data.length).fill(false));
     const { destinationSelectedAirPort, departureformattedDate, originSelectedAirport, returnDate, departure, adults, children, infants, returnformattedDate, classes } = useSelector((state: RootState) => state.flightReducer)
     const travellers = adults + children + infants
-
+useEffect(()=>
+{
+dispatch(fetchFlightsLogos())
+},[])
     const handleSeeAll = (index:any) => {
       setShowAll((prevShowAll) => {
         const updatedShowAll = [...prevShowAll];
@@ -24,10 +30,12 @@ const FlightsRes = (props: any) => {
     }
     const MyListItem =  React.memo(({ item, index }:{item:any,index:number}) =>{
      const singleCard=item[0].Segments.flat(1)
+     console.log(item)
+     const items=item.Segments
      const farePrice=item[0].Fare.OfferedFare
     return (
           <View key={`${index}-0`} style={{marginTop:20,paddingHorizontal:10}}>
-          <FlightDataCard airlineCode={singleCard[0].Airline.AirlineCode} airlineName={singleCard[0].Airline.AirlineName} flightsNumdata={singleCard} price={farePrice}/>
+          <FlightDataCard flightsNumdata={singleCard} price={farePrice} singleItem={item}/>
           </View>
     )})
     return (
@@ -57,6 +65,7 @@ const FlightsRes = (props: any) => {
      contentContainerStyle={{paddingBottom:responsiveHeight(25)}} 
      windowSize={5}  
     maxToRenderPerBatch={5}/>}
+    {/* <RemainingFlights/> */}
             </View>
         </View>
     )
