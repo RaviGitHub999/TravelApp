@@ -30,12 +30,11 @@ dispatch(fetchFlightsLogos())
     }
     const MyListItem =  React.memo(({ item, index }:{item:any,index:number}) =>{
      const singleCard=item[0].Segments.flat(1)
-     console.log(item)
-     const items=item.Segments
+    //  console.log(item[0].ResultIndex,"1111")
      const farePrice=item[0].Fare.OfferedFare
     return (
           <View key={`${index}-0`} style={{marginTop:20,paddingHorizontal:10}}>
-          <FlightDataCard flightsNumdata={singleCard} price={farePrice} singleItem={item}/>
+          <FlightDataCard flightsNumdata={singleCard} price={farePrice} singleItem={item} i={index}/>
           </View>
     )})
     return (
@@ -64,7 +63,8 @@ dispatch(fetchFlightsLogos())
         keyExtractor={(item, index) => String(index)}
      contentContainerStyle={{paddingBottom:responsiveHeight(25)}} 
      windowSize={5}  
-    maxToRenderPerBatch={5}/>}
+    maxToRenderPerBatch={5}
+    />}
     {/* <RemainingFlights/> */}
             </View>
         </View>

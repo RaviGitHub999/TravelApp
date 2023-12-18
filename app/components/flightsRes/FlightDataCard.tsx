@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import firestore from '@react-native-firebase/firestore';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from '../../utils/responsiveScale';
@@ -36,10 +36,10 @@ interface IProps {
         GroundTime:number
     } [],
     price: number,
-    singleItem:any
+    singleItem:any,
+    i:number
 }
-const FlightDataCard: React.FC<IProps> = React.memo(({flightsNumdata, price,singleItem }) => {
-    console.log(singleItem)
+const FlightDataCard: React.FC<IProps> = React.memo(({flightsNumdata, price,singleItem,i }) => {
    const dispatch=useDispatch()
     const [modalVisible, setModalVisible] = useState(false);
     const[viewAll,setViewAll]=useState(false)
@@ -127,17 +127,30 @@ const FlightDataCard: React.FC<IProps> = React.memo(({flightsNumdata, price,sing
         )
     })
     const farePrice = (p: number) => {
-        const roundedNumber = Math.round(p);
+        const roundedNumber = Math.ceil(p);
         const formattedNumber = roundedNumber.toLocaleString('en-IN', {
             style: 'currency',
             currency: 'INR',
         });
         return formattedNumber.slice(0, formattedNumber.indexOf("."))
     }
-    const du=()=>
+    const handleEachFlightCard=({item,index}:{item:any,index:number})=>
     {
-        // dispatch(handleViewAllFlights(singleItem))
-        setViewAll(true)
+    return(
+        <View style={styles.viewAllRenderingContainer}>
+        <View style={styles.viewAllEachCard}>
+        <Text style={styles.fareClassification}>{item.FareClassification.Type}</Text>
+        <View style={styles.viewAlliconContainer}>
+        <TouchableOpacity><IconSwitcher componentName='MaterialCommunityIcons' iconName='bag-suitcase-outline' color='black' iconsize={3.5} /></TouchableOpacity>
+        <TouchableOpacity><IconSwitcher componentName='MaterialCommunityIcons' iconName='cancel' color='black' iconsize={3.5} /></TouchableOpacity>
+        </View>
+    </View>
+    <Text style={styles.farePrice}>{farePrice(item.Fare.OfferedFare)}</Text>
+    <TouchableOpacity style={styles.bookingButton}>
+        <Text style={styles.bookingButtonText}>Book</Text>
+    </TouchableOpacity>
+        </View>
+    )
     }
     return (
         <View style={styles.mainContainer}>
@@ -194,8 +207,8 @@ const FlightDataCard: React.FC<IProps> = React.memo(({flightsNumdata, price,sing
                     </View>
                 </View>
             </Modal>
-            <TouchableOpacity style={{alignItems:'center'}} onPress={du}><Text style={{color:colors.facebook}}>View All</Text></TouchableOpacity>
-            {<RemainingFlights/>}
+            <TouchableOpacity style={{alignItems:'center'}} onPress={()=>setViewAll(!viewAll)}><Text style={{color:colors.facebook}} >View All</Text></TouchableOpacity>
+       {viewAll&&<FlatList data={singleItem.slice(1)} renderItem={handleEachFlightCard} keyExtractor={(item=>item.ResultIndex)} nestedScrollEnabled />}
         </View>
     )
 })
@@ -364,6 +377,28 @@ columnGap:responsiveWidth(2)
     bookingButtonText:{
         color:colors.white,
         fontFamily:fonts.textInput
+    },
+    viewAllEachCard:{
+        width:"25%",
+      rowGap:responsiveHeight(0.9)
+    },
+    viewAlliconContainer:{
+        flexDirection:'row',
+        justifyContent:'space-between'
+    },
+    viewAllRenderingContainer:{
+        marginBottom:responsiveHeight(2),
+        flexDirection:'row',
+        justifyContent:'space-between',
+        alignItems:"center",
+        backgroundColor:colors.gray,
+        borderRadius:responsiveHeight(2),
+        padding:responsiveHeight(1.3)
+    },
+    fareClassification:{
+fontSize:responsiveHeight(1.6),
+fontFamily:fonts.primary,
+color:colors.facebook
     }
 })
 
