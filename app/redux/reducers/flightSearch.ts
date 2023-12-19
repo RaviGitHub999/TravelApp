@@ -4,7 +4,6 @@ import AirportsData from "../../components/jsonData/Airports.json"
 import axios, { CancelTokenSource } from "axios";
 import networkCall from "../../utils/networkCall";
 import firestore from '@react-native-firebase/firestore';
-import { ActionSheetIOS } from "react-native";
 interface NetworkState {
     getState: Function,
     fulfillWithValue: Function,
@@ -546,7 +545,7 @@ export const selectOriginWithDebounce = (query: string) => (dispatch: any, getSt
 export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
     debouncedSearchDestinationAirport(dispatch, getState, query)
 }
-export const { handleClass, handleDropDownState,handleViewAllFlights, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
+export const { handleClass, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
 export default flightSearch.reducer
 
 

@@ -8,7 +8,7 @@ import { colors } from '../../config/theme'
 import FlightDataCard from './FlightDataCard'
 import { responsiveHeight } from '../../utils/responsiveScale'
 import { fetchFlightsLogos } from '../../redux/reducers/flightSearch'
-import RemainingFlights from './RemainingFlights'
+
 const FlightsRes = (props: any) => {
     const [expandedCardIndex, setExpandedCardIndex] = useState(null);
     const dispatch:AppDispatch=useDispatch()
