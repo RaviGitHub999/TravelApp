@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import Fuse from 'fuse.js';
 import AirportsData from "../../components/jsonData/Airports.json"
 import axios, { CancelTokenSource } from "axios";
@@ -65,7 +65,9 @@ interface InitialState {
     airlinelogos: [],
     status: string,
     error: any,
-    RemainingFlights:any
+    RemainingFlights:any,
+    showFilters:boolean,
+    flightsNamesList:[]
 }
 const initialState: InitialState = {
     origin: "",
@@ -115,7 +117,9 @@ const initialState: InitialState = {
     airlinelogos: [],
     status: 'idle',
     error: null,
-    RemainingFlights:[]
+    RemainingFlights:[],
+    showFilters:false,
+    flightsNamesList:[]
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -469,15 +473,14 @@ export const flightSearch = createSlice(
             handleJourneyWay: (state, action) => {
                 state.journeyWay = action.payload
             },
-            handleViewAllFlights: (state,action) => 
+            handleFlightsFilter:(state,action)=>
             {
-                console.log(action.payload)
-                const data=state.flightsData.flat(1)
-const item=data.filter((ele,ind)=>ind===action.payload)
-state.RemainingFlights=item.flat(1)
-console.log("hiuu")  
-            }
-              
+                state.showFilters=action.payload
+            } ,
+            handleFlightNmaes:(state,action)=>
+            {
+console.log(action.payload)
+            }    
         },
 
         extraReducers: (builder) => {
@@ -545,7 +548,7 @@ export const selectOriginWithDebounce = (query: string) => (dispatch: any, getSt
 export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
     debouncedSearchDestinationAirport(dispatch, getState, query)
 }
-export const { handleClass, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
+export const {handleFlightNmaes, handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
 export default flightSearch.reducer
 
 

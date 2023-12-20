@@ -49,5 +49,31 @@ fontFamily:fonts.textFont
     right: 0,
     alignItems: 'center',
     justifyContent: 'center',
+},
+nodata:{
+    textAlign:'center',
+    textAlignVertical:'center',
+    flex:1,
+    fontSize:responsiveHeight(2.5),
+    fontFamily:fonts.textFont,
+    color:colors.black
+},
+filtersHeaderContainer:{
+flexDirection:'row',
+justifyContent:'space-between',
+paddingHorizontal:responsiveHeight(1),
+paddingVertical:responsiveHeight(1.5),
+borderBlockColor:colors.white,
+elevation:responsiveHeight(0.1)
+},
+filtersIconContainer:{
+    flexDirection:'row',
+    columnGap:responsiveHeight(1),
+    alignItems:'center'
+},
+filterHeader:{
+    fontSize:responsiveHeight(2.5),
+    color:colors.black,
+    fontFamily:fonts.textFont
 }
 })

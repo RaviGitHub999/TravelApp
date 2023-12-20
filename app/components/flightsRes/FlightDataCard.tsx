@@ -6,6 +6,7 @@ import IconSwitcher from '../common/icons/IconSwitcher';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { colors, fonts } from '../../config/theme';
+import { handleFlightNmaes } from '../../redux/reducers/flightSearch';
 type RuleType = {
     [key: string]: string;
 };
@@ -64,12 +65,14 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
     const [viewAll, setViewAll] = useState(false)
     const [popups, setPopUps] = useState({ luggageBag: false, cancellation: false,eachCardluggageBag:false,eachCardcancellation:false })
     const[ind,setInd]=useState(0)
-    const[cancelind,setCancelInd]=useState(0)
+    let airlineNamesList=[]
     const { originSelectedAirport, destinationSelectedAirPort, airlinelogos } = useSelector((state: RootState) => state.flightReducer)
     const airlineName = flightsNumdata[0].Airline.AirlineName
+    dispatch(handleFlightNmaes(flightsNumdata[0].Airline.AirlineName))
+// airlineNamesList.push(flightsNumdata[0].Airline.AirlineName)
     const DepTime = flightsNumdata[0]?.Origin?.DepTime
     const ArrTime = flightsNumdata[flightsNumdata.length - 1].Destination.ArrTime
-    const cancellationData = singleItem[0].MiniFareRules.flat(1)
+    const cancellationData = singleItem[0]?.MiniFareRules?.flat(1)
     const fn = flightsNumdata.map((ele: any, ind) => {
         return (
             <Text key={ind}>{ind > 0 && ', '}{`${ele.Airline.AirlineCode} - ${ele.Airline.FlightNumber} ${ele.Airline.FareClass}`}</Text>
@@ -198,13 +201,15 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
         setPopUps({ ...popups, cancellation: false })
     }
     const handlePopForluaggageBag = (data: FlightsData[]) => {
-
+       if(data!==undefined)
+       {
         return (
             <View style={styles.luaggageBagPopupContainer}>
                 <View style={styles.line}></View>
                 <Text style={styles.luaggageBagPopuptext}>{`Check-In baggage: ${data[0].Baggage} | Cabin baggage: ${data[0].CabinBaggage}`}</Text>
             </View>
         )
+       }
     }
     // const handlePopForeachluaggageBag = (data: FlightsData[]) => {
     //     return (
@@ -214,7 +219,8 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
     //         </View>
     //     )
     // }
-    console.log(singleItem.slice(1)[5], "=========>");
+    // console.log(singleItem.slice(1)[5], "=========>");
+
 // console.log(singleItem.slice(1)[0].Segments.flat(1)[0].CabinBaggage)
     const handleConcellaion = (MiniFareRules: FlightsData[]) => {
      return MiniFareRules?.map((ele, ind) => {
@@ -230,9 +236,9 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
             )
         })
     }
-    useEffect(() => {
-        console.log("first")
-    }, [])
+    // useEffect(() => {
+    //     console.log("first")
+    // }, [])
     return (
         <View style={styles.mainContainer}>
             <View style={styles.logoHeader}>
@@ -287,7 +293,7 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
                     </View>
                 </View>
             </Modal>
-            <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => setViewAll(!viewAll)}><Text style={{ color: colors.facebook }} >View All</Text></TouchableOpacity>
+           { singleItem.slice(1).length!==0&&<TouchableOpacity style={{ alignItems: 'center' }} onPress={() => setViewAll(!viewAll)}><Text style={{ color: colors.facebook }} >View All</Text></TouchableOpacity>}
             {viewAll && <FlatList data={singleItem.slice(1)} renderItem={handleEachFlightCard} keyExtractor={(item => item.ResultIndex)} nestedScrollEnabled />}
             <Modal animationType="slide"
                 visible={popups.luggageBag}>
@@ -303,7 +309,7 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
                 <View style={styles.modelMainContainer}>
                     <View style={styles.luggagePopUpmodelSubcontainer}>
                         <TouchableOpacity style={styles.crossIcon} onPress={disableEachCardPopUp}><IconSwitcher componentName='Entypo' iconName='cross' color={colors.black} iconsize={3} /></TouchableOpacity>
-                        {handlePopForluaggageBag(singleItem.slice(1)[ind].Segments.flat(1))}
+                        {handlePopForluaggageBag(singleItem.slice(1)[ind]?.Segments?.flat(1))}
                     </View>
                 </View>
             </Modal>
@@ -322,7 +328,7 @@ const FlightDataCard: React.FC<IProps> = React.memo(({ flightsNumdata, price, si
                             <View >
                                 {handleConcellaion(cancellationData)}
                             </View>
-                            <View style={styles.dashedLine}></View>
+                            {cancellationData&&<View style={styles.dashedLine}></View>}
                         </View>
                     </View>
                 </Modal>

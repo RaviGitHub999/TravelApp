@@ -251,82 +251,108 @@ const data=[
 // });
 
 // export default DisplayCards;
-import React, { useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+// import React, { useState } from 'react';
+// import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
 
-const DisplayCards = () => {
-  const [showAll, setShowAll] = useState(Array(data.length).fill(false));
+// const DisplayCards = () => {
+//   const [showAll, setShowAll] = useState(Array(data.length).fill(false));
 
-  const handleSeeAll = (index) => {
-    setShowAll((prevShowAll) => {
-      const updatedShowAll = [...prevShowAll];
-      updatedShowAll[index] = !updatedShowAll[index];
-      return updatedShowAll;
-    });
-  };
+//   const handleSeeAll = (index) => {
+//     setShowAll((prevShowAll) => {
+//       const updatedShowAll = [...prevShowAll];
+//       updatedShowAll[index] = !updatedShowAll[index];
+//       return updatedShowAll;
+//     });
+//   };
 
-  const renderItem = ({ item, index }) => (
-    <View style={styles.cardContainer}>
-      {showAll[index] ? (
-        // If "See All" button is clicked, display all items in the array
-        item.map((obj, objIndex) => (
-          <View key={`${index}-${objIndex}`} style={styles.card}>
-            {obj.segment[0].map((person, personIndex) => (
-              <View key={`${index}-${objIndex}-${personIndex}`}>
-                <Text>Name: {person.name}</Text>
-                <Text>Age: {person.age}</Text>
-              </View>
-            ))}
-          </View>
-        ))
-      ) : (
-        // Display only the first item in the array initially
-        <View key={`${index}-0`} style={styles.card}>
-          {item[0].segment[0].map((person, personIndex) => (
-            <View key={`${index}-0-${personIndex}`}>
-              <Text>Name: {person.name}</Text>
-              <Text>Age: {person.age}</Text>
-            </View>
-          ))}
-        </View>
-      )}
-      {!showAll[index] && (
-        <Button title="See All" onPress={() => handleSeeAll(index)} />
-      )}
-    </View>
-  );
+  // const renderItem = ({ item, index }) => (
+  //   <View style={styles.cardContainer}>
+  //     {showAll[index] ? (
+  //       // If "See All" button is clicked, display all items in the array
+  //       item.map((obj, objIndex) => (
+  //         <View key={`${index}-${objIndex}`} style={styles.card}>
+  //           {obj.segment[0].map((person, personIndex) => (
+  //             <View key={`${index}-${objIndex}-${personIndex}`}>
+  //               <Text>Name: {person.name}</Text>
+  //               <Text>Age: {person.age}</Text>
+  //             </View>
+  //           ))}
+  //         </View>
+  //       ))
+  //     ) : (
+  //       // Display only the first item in the array initially
+  //       <View key={`${index}-0`} style={styles.card}>
+  //         {item[0].segment[0].map((person, personIndex) => (
+  //           <View key={`${index}-0-${personIndex}`}>
+  //             <Text>Name: {person.name}</Text>
+  //             <Text>Age: {person.age}</Text>
+  //           </View>
+  //         ))}
+  //       </View>
+  //     )}
+  //     {!showAll[index] && (
+  //       <Button title="See All" onPress={() => handleSeeAll(index)} />
+  //     )}
+  //   </View>
+  // );
 
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => String(index)}
-      />
-    </View>
-  );
-};
+//   return (
+//     <View style={styles.container}>
+//       <FlatList
+//         data={data}
+//         renderItem={renderItem}
+//         keyExtractor={(item, index) => String(index)}
+//       />
+//     </View>
+//   );
+// };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardContainer: {
-    justifyContent: 'space-around',
-    marginBottom: 20,
-  },
-  card: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    margin: 5,
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   cardContainer: {
+//     justifyContent: 'space-around',
+//     marginBottom: 20,
+//   },
+//   card: {
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     padding: 10,
+//     margin: 5,
+//   },
+// });
 
-export default DisplayCards;
+// export default DisplayCards;
 
+import { View, Text } from 'react-native'
+import React, { useState } from 'react'
+import CustomRadioButton from './common/customRadioButton/CustomRadioButton';
 
+const Dummy = () => {
+  const [selectedValue, setSelectedValue] = useState(""); 
+  console.log(selectedValue)
+  return ( 
+    <View> 
+        <CustomRadioButton 
+            label="ReactJS"
+            selected={selectedValue === 'option1'} 
+            onSelect={() => setSelectedValue('option1')} 
+        /> 
+        <CustomRadioButton 
+            label="NextJs"
+            selected={selectedValue === 'option2'} 
+            onSelect={() => setSelectedValue('option2')} 
+        /> 
+        <CustomRadioButton 
+            label="React Native"
+            selected={selectedValue === 'option3'} 
+            onSelect={() => setSelectedValue('option3')} 
+        /> 
+    </View> 
+); 
+}
 
-
+export default Dummy

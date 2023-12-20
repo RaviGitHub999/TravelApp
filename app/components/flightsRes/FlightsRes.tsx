@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity,FlatList, Button, ActivityIndicator} from 'react-native'
-import React ,{useEffect, useState} from 'react'
+import { View, Text, TouchableOpacity, FlatList, Button, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { styles } from './styles'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../redux/store'
@@ -7,42 +7,44 @@ import IconSwitcher from '../common/icons/IconSwitcher'
 import { colors } from '../../config/theme'
 import FlightDataCard from './FlightDataCard'
 import { responsiveHeight } from '../../utils/responsiveScale'
-import { fetchFlightsLogos } from '../../redux/reducers/flightSearch'
+import { fetchFlightsLogos, handleFlightsFilter } from '../../redux/reducers/flightSearch'
+import ProgressBar from '../common/progressBar/ProgressBar'
+import { translate } from '../../config/i18n'
+import en from '../../config/locales/en'
+import FlightFilters from '../flightfilters/FlightFilters'
 
 const FlightsRes = (props: any) => {
-    const [expandedCardIndex, setExpandedCardIndex] = useState(null);
-    const dispatch:AppDispatch=useDispatch()
-    const {flightsData,flightSearchLoading}=useSelector((state:RootState)=>state.flightReducer)
-    const data=flightsData.flat(1)
-    const [showAll, setShowAll] = useState(Array(data.length).fill(false));
+    const dispatch: AppDispatch = useDispatch()
+    const [show,setShow]=useState(false)
+    const { flightsData, flightSearchLoading,showFilters } = useSelector((state: RootState) => state.flightReducer)
+    const data = flightsData.flat(1)
     const { destinationSelectedAirPort, departureformattedDate, originSelectedAirport, returnDate, departure, adults, children, infants, returnformattedDate, classes } = useSelector((state: RootState) => state.flightReducer)
     const travellers = adults + children + infants
-useEffect(()=>
-{
-dispatch(fetchFlightsLogos())
-},[])
-    const handleSeeAll = (index:any) => {
-      setShowAll((prevShowAll) => {
-        const updatedShowAll = [...prevShowAll];
-        updatedShowAll[index] = !updatedShowAll[index];
-        return updatedShowAll;
-      });
-    }
-    const MyListItem =  React.memo(({ item, index }:{item:any,index:number}) =>{
-     const singleCard=item[0].Segments.flat(1)
-    //  console.log(item[0].ResultIndex,"1111")
-     const farePrice=item[0].Fare.OfferedFare
-    return (
-          <View key={`${index}-0`} style={{marginTop:20,paddingHorizontal:10}}>
-          <FlightDataCard flightsNumdata={singleCard} price={farePrice} singleItem={item} i={index}/>
-          </View>
-    )})
+    useEffect(() => {
+        dispatch(fetchFlightsLogos())
+    }, [])
+    // const handleSeeAll = (index:any) => {
+    //   setShowAll((prevShowAll) => {
+    //     const updatedShowAll = [...prevShowAll];
+    //     updatedShowAll[index] = !updatedShowAll[index];
+    //     return updatedShowAll;
+    //   });
+    // }
+    const MyListItem = React.memo(({ item, index }: { item: any, index: number }) => {
+        const singleCard = item[0].Segments.flat(1)
+        const farePrice = item[0].Fare.OfferedFare
+        return (
+            <View key={`${index}-0`} style={{ marginTop: 20, paddingHorizontal: 10 }}>
+                <FlightDataCard flightsNumdata={singleCard} price={farePrice} singleItem={item} i={index} />
+            </View>
+        )
+    })
     return (
         <View style={styles.mainContainer}>
             <View style={styles.headerContainer}>
                 <View style={styles.header}>
                     <Text style={styles.title}>{`${originSelectedAirport.address.cityName} to ${destinationSelectedAirPort.address.cityName}`}</Text>
-                    <TouchableOpacity style={styles.editButton} onPress={() =>props.navigation.goBack()}>
+                    <TouchableOpacity style={styles.editButton} onPress={() => props.navigation.goBack()}>
                         <IconSwitcher componentName='MaterialIcons' iconName='edit' color={colors.white} iconsize={2.3} />
                     </TouchableOpacity>
                 </View>
@@ -53,22 +55,35 @@ dispatch(fetchFlightsLogos())
                     <Text style={styles.descriptionTitles}>{classes}</Text>
                 </View>
             </View>
+            {/* {filters} */}  
+            {
+                showFilters?<FlightFilters/>:<View style={styles.filtersHeaderContainer}>
+                <View style={styles.filtersIconContainer}>
+                    <Text style={styles.filterHeader}>{translate(en.flightsRes.filter)}</Text>
+                    <IconSwitcher  componentName='FontAwesome5' iconName='filter' color={colors.black} iconsize={3}/>
+                </View>
+                <TouchableOpacity onPress={()=>dispatch(handleFlightsFilter(true))}>
+                <IconSwitcher  componentName='Ionicons' iconName='chevron-down' color={colors.black} iconsize={3.5} />
+                </TouchableOpacity>
+            </View>
+            }
 
-              {/*flightsRes */}
+
+
+
+            {/*flightsRes */}
 
             <View style={styles.activeIndicatorMainContainer}>
-           {flightSearchLoading?<ActivityIndicator size={responsiveHeight(5)} color={colors.facebook} style={styles.activeIndicator}/>:flightsData.length===0?<Text>No data</Text>:<FlatList
-        data={data}
-        renderItem={({ item ,index}) => <MyListItem item={item} index={index} />}
-        keyExtractor={(item, index) => String(index)}
-     contentContainerStyle={{paddingBottom:responsiveHeight(25)}} 
-     windowSize={5}  
-    maxToRenderPerBatch={5}
-    />}
-    {/* <RemainingFlights/> */}
+                {flightSearchLoading ? <View style={styles.activeIndicator}><ProgressBar /></View> : flightsData.length === 0 ? <Text style={styles.nodata}>{translate(en.flightsRes.noData)}</Text> : <FlatList
+                    data={data}
+                    renderItem={({ item, index }) => <MyListItem item={item} index={index} />}
+                    keyExtractor={(_, index) => String(index)}
+                    contentContainerStyle={{ paddingBottom: responsiveHeight(25) }}
+                    windowSize={5}
+                    maxToRenderPerBatch={5}
+                />}
             </View>
         </View>
     )
 }
-
 export default FlightsRes
