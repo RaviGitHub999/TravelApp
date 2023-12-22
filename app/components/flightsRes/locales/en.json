@@ -1,4 +1,9 @@
 {
     "filter":"Filters",
-    "noData":"No Flights Found!!!"
+    "noData":"No Flights Found!!!",
+    "airline":"Airline",
+    "stops":"Stops",
+    "arrivalTime":"Arrival Time",
+    "departureTime":"Departure Time",
+    "sort":"Sort"
 }

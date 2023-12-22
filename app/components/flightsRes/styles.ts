@@ -39,7 +39,7 @@ fontSize:responsiveFontSize(2),
 fontFamily:fonts.textFont
     },
     activeIndicatorMainContainer:{
-        flex:1
+        flex:1,
     },
     activeIndicator:{ 
     position: 'absolute',

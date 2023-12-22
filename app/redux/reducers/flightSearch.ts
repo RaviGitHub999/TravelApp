@@ -9,6 +9,11 @@ interface NetworkState {
     fulfillWithValue: Function,
     rejectWithValue: Function
 }
+interface AirlineLogo {
+    id: string;
+    url: string;
+    // Add other properties if needed
+}
 export interface SelectedFlightObj {
     name: string;
     iataCode: string;
@@ -67,7 +72,9 @@ interface InitialState {
     error: any,
     RemainingFlights:any,
     showFilters:boolean,
-    flightsNamesList:[]
+    flightsNamesList:any[],
+    singleSigment:any[],
+    flightLogo:string|null
 }
 const initialState: InitialState = {
     origin: "",
@@ -119,7 +126,9 @@ const initialState: InitialState = {
     error: null,
     RemainingFlights:[],
     showFilters:false,
-    flightsNamesList:[]
+    flightsNamesList:[],
+    singleSigment:[],
+    flightLogo:""
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -476,11 +485,19 @@ export const flightSearch = createSlice(
             handleFlightsFilter:(state,action)=>
             {
                 state.showFilters=action.payload
-            } ,
-            handleFlightNmaes:(state,action)=>
+            },
+            handleFlightNames:(state)=>
             {
-console.log(action.payload)
-            }    
+                state.singleSigment.flat(1).map((ele)=>
+                {
+                    if(!state.flightsNamesList.includes(ele.Airline.Airline))
+                    {
+state.flightsNamesList.push(ele)
+                    }
+                })
+
+            }
+          
         },
 
         extraReducers: (builder) => {
@@ -512,8 +529,10 @@ console.log(action.payload)
             });
 
             builder.addCase(flightSearching.fulfilled, (state, action) => {
-                state.flightsData = action.payload.flightResult.Response.Results,
-                    state.flightSearchLoading = false
+                state.flightsData = action.payload.flightResult.Response.Results.flat(1)
+                state.flightSearchLoading = false
+                state.singleSigment=state.flightsData.map((ele)=>ele[0].Segments.flat(1))
+                // console.log(state.flightsData.map((ele)=>ele.Segments.flat(1)))
             });
 
             builder.addCase(flightSearching.pending, (state) => {
@@ -548,7 +567,7 @@ export const selectOriginWithDebounce = (query: string) => (dispatch: any, getSt
 export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
     debouncedSearchDestinationAirport(dispatch, getState, query)
 }
-export const {handleFlightNmaes, handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
+export const {handleFlightNames,handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
 export default flightSearch.reducer
 
 

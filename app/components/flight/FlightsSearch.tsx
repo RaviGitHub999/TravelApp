@@ -7,7 +7,7 @@ import DropDown from '../common/dropDown/DropDown'
 import CustomButton from '../common/customButton/CustomButton'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux'
-import { handleChangeOriginTextInput, handleChangeDestinationTextInput, handleDepartureDateChange, handleOriginSelectedAirPort, handleReturnDateChange, selectDestinationWithDebounce, selectOriginWithDebounce, handleDestinationSelectedAirPort, handleJourneyWay, flightSearching, SelectedFlightObj } from '../../redux/reducers/flightSearch'
+import { handleChangeOriginTextInput, handleChangeDestinationTextInput, handleDepartureDateChange, handleOriginSelectedAirPort, handleReturnDateChange, selectDestinationWithDebounce, selectOriginWithDebounce, handleDestinationSelectedAirPort, handleJourneyWay, flightSearching, SelectedFlightObj, fetchFlightsLogos } from '../../redux/reducers/flightSearch'
 import { AppDispatch, RootState } from '../../redux/store'
 const btns = [{ journeyType: "One Way", journeyTypeNo: "1" }, { journeyType: "Round Trip", journeyTypeNo: "2" }]
 interface IBtns {
@@ -95,6 +95,7 @@ if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.ci
   {
     navigate("OneWayFlights")
     dispatch(flightSearching()) 
+    dispatch(fetchFlightsLogos())
   }
   
 }
