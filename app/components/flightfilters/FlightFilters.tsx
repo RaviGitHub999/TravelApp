@@ -76,7 +76,7 @@ const FlightFilters = () => {
    <View style={styles.filtersmainContainer}>
    <View>
       <Text style={styles.filterTitles}>{translate(en.flightsRes.airline)}</Text>
-      <FlatList data={flightsNamesList} renderItem={handleFlightsNames} numColumns={3}/>
+      {/* <FlatList data={flightsNamesList} renderItem={handleFlightsNames} numColumns={3}/> */}
     </View>
     <View>
       <Text style={styles.filterTitles}>{translate(en.flightsRes.stops)}</Text>

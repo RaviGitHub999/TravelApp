@@ -602,7 +602,7 @@
 // })
 
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Modal } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from '../../utils/responsiveScale'
 import { colors, fonts } from '../../config/theme'
 import IconSwitcher from '../common/icons/IconSwitcher'
@@ -618,10 +618,10 @@ const FlightDataCard = () => {
     const [openIndices, setOpenIndices] = useState<number[]>([]);
     const { singleSigment, airlinelogos, originSelectedAirport, destinationSelectedAirPort, flightsData } = useSelector((state: RootState) => state.flightReducer)
     const dispatch: AppDispatch = useDispatch()
-    const flightSymbol = (airlineName: string) => {
-        const logo: LogosData[] = airlinelogos.filter((ele: { id: string }) => ele.id === airlineName?.toLowerCase())
-        return logo[0]?.url
-    }
+    const flightSymbol = useCallback((airlineName: string): string | undefined => {
+        const logo: LogosData | undefined = airlinelogos.find(ele => ele.id === airlineName?.toLowerCase());
+        return logo?.url;
+      }, [airlinelogos]);
     const flightNumbers = (item: any) => {
         return (
             item.map((ele: any, ind: number) => {
@@ -716,18 +716,15 @@ const FlightDataCard = () => {
         )
     })
  }
-const handleVisibility=(ele:any)=>
-{
-    setModalVisible(true)
-    setClicked(ele)
-}
-const toggleOpen = (index:number) => {
-    if (openIndices.includes(index)) {
-      setOpenIndices(openIndices.filter(i => i !== index));
-    } else {
-      setOpenIndices([...openIndices, index]);
-    }
-  };
+ const handleVisibility = useCallback((ele: any) => {
+    setModalVisible(true);
+    setClicked(ele);
+}, []);
+const toggleOpen = useCallback((index: number) => {
+    setOpenIndices(prevIndices => prevIndices.includes(index) 
+        ? prevIndices.filter(i => i !== index) 
+        : [...prevIndices, index]);
+}, []);
     const handleEachFlightCard = ({ item, index }: { item: any, index: number}) => {
         return (
             <View style={styles.viewAllRenderingContainer}>
@@ -745,7 +742,7 @@ const toggleOpen = (index:number) => {
             </View>
         )
     } 
-    const HandleRendering = React.memo(({ item, index }: { item: any, index: number }) => {
+    const HandleRendering = useCallback(({ item, index }: { item: any, index: number }) => {
         // console.log(item,"----------")
         // flightsData[index][0].Segments.flat(1).slice(1)[0].Fare
         // console.log(flightsData[index][1].Segments.flat(1),"0000")
@@ -800,10 +797,10 @@ const toggleOpen = (index:number) => {
             </View>
 
         )
-    })
+    },[])
     return (
       <View>
-          <FlatList data={singleSigment}  renderItem={({ item,index }) => <HandleRendering item={item} index={index} />} contentContainerStyle={{ paddingBottom: responsiveHeight(5) }} />
+          <FlatList data={singleSigment}  renderItem={({ item,index }) => <HandleRendering item={item} index={index}/>} contentContainerStyle={{ paddingBottom: responsiveHeight(5) }} />
             <Modal animationType="slide"
                 visible={modalVisible}>
                 <View style={styles.modelMainContainer}>
@@ -813,15 +810,6 @@ const toggleOpen = (index:number) => {
                     </View>
                 </View>
             </Modal> 
-            {/* <Modal animationType="slide"
-                visible={popups.luggageBag}>
-                <View style={styles.modelMainContainer}>
-                    <View style={styles.luggagePopUpmodelSubcontainer}>
-                        <TouchableOpacity style={styles.crossIcon} onPress={disablePopUps}><IconSwitcher componentName='Entypo' iconName='cross' color={colors.black} iconsize={3} /></TouchableOpacity>
-                        {handlePopForluaggageBag(flightsNumdata)}
-                    </View>
-                </View>
-            </Modal> */}
       </View>
     )
 }
