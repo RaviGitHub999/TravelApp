@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { styles } from './styles'
 import { responsiveWidth } from '../../utils/responsiveScale'
 import SearchInputs from '../common/searchInputs/SearchInputs'
@@ -88,17 +88,13 @@ const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
     </View>
   </TouchableOpacity>
   ));
-const handleSearch=()=>
-{
- 
-if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.cityName&&departureformattedDate.length!==0)
-  {
-    navigate("OneWayFlights")
-    dispatch(flightSearching()) 
-    dispatch(fetchFlightsLogos())
-  }
-  
-}
+  const handleSearch = useMemo(() => () => {
+    if (originSelectedAirport.address.cityName && destinationSelectedAirPort.address.cityName && departureformattedDate.length !== 0) {
+      navigate("OneWayFlights");
+      dispatch(flightSearching());
+      dispatch(fetchFlightsLogos());
+    }
+  }, [originSelectedAirport.address.cityName, destinationSelectedAirPort.address.cityName, departureformattedDate, navigate, dispatch, flightSearching, fetchFlightsLogos]);
 
 
 
@@ -178,4 +174,4 @@ if(originSelectedAirport.address.cityName&&destinationSelectedAirPort.address.ci
   )
 }
 
-export default FlightsSearch
+export default React.memo(FlightsSearch)

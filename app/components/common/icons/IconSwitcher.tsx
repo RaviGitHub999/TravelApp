@@ -58,4 +58,4 @@ const IconSwitcher:React.FC<IProps>= ({componentName,iconName,color,iconsize}) =
  }
 }
 
-export default IconSwitcher
+export default React.memo(IconSwitcher)

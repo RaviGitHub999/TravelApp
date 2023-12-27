@@ -608,6 +608,8 @@ import { colors, fonts } from '../../config/theme'
 import IconSwitcher from '../common/icons/IconSwitcher'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../redux/store'
+import Dummy2 from '../../../Dummy2'
+import FlightCard from './FlightCard'
 interface LogosData {
     id: string,
     url: string
@@ -742,66 +744,73 @@ const toggleOpen = useCallback((index: number) => {
             </View>
         )
     } 
-    const HandleRendering = useCallback(({ item, index }: { item: any, index: number }) => {
+    const HandleRendering = React.memo(({ item, index }: { item: any, index: number }) => {
         // console.log(item,"----------")
         // flightsData[index][0].Segments.flat(1).slice(1)[0].Fare
         // console.log(flightsData[index][1].Segments.flat(1),"0000")
-        return (
-            <View style={styles.mainContainer}>
-                <View style={styles.logoHeader}>
-                    <View style={styles.flightLogoContainer}>{flightSymbol(item[0].Airline.AirlineName) ? (
-                        <Image source={{ uri: flightSymbol(item[0].Airline.AirlineName) }} style={styles.flightLogo} resizeMode='contain' />
-                    ) : <IconSwitcher componentName='FontAwesome5' iconName='plane-departure' iconsize={3} />}</View>
-                    <Text style={styles.airlineName}>{`${item[0].Airline.AirlineName}`}</Text>
-                    <View style={{ width: "60%" }}>
-                        <Text style={styles.flightNumbers}>({flightNumbers(item)})</Text>
-                    </View>
-                </View>
-                <View style={styles.flightsTimingContainer}>
-                    <View style={styles.originContainer}>
-                        <Text style={styles.flightTimings}>{flightsTimings(item[0]?.Origin?.DepTime)}</Text>
-                        <Text style={styles.originTitle}>{originSelectedAirport.iataCode}</Text>
-                    </View>
-                    <View style={styles.directionContainer} >
-                        <TouchableOpacity style={styles.stopsBtn} onPress={()=>handleVisibility(item)}>
-                            <Text style={styles.stopsBtnText}>{item.length > 1 ? `${item.length - 1} ${item.length > 1 ? "Stop" : "Stops"}` : "Direct"}</Text>
-                            <IconSwitcher componentName='EvilIcons' iconName='chevron-up' iconsize={3.5} color={colors.highlight} />
-                        </TouchableOpacity>
-                        <View style={{ borderTopWidth: 1, borderStyle: "dashed" }}></View>
-                        <Text style={styles.flighttotalTime}> {totalTimeTravelling(item[0]?.Origin?.DepTime, item[item.length - 1].Destination.ArrTime, item)}</Text>
-                    </View>
-                    <View style={styles.destinationContainer}>
-                        <Text style={styles.flightTimings}>{flightsTimings(item[item.length - 1].Destination.ArrTime)}</Text>
-                        <Text style={styles.destinationTitle}>{destinationSelectedAirPort.iataCode}</Text>
-                    </View>
-                    <View>
-                    </View>
-                </View>
-                <View style={styles.flightPricesContainer}>
-                    <View style={styles.luggageBagContainer}>
-                        <TouchableOpacity><IconSwitcher componentName='MaterialCommunityIcons' iconName='bag-suitcase-outline' color='black' iconsize={3.5} /></TouchableOpacity>
-                        <TouchableOpacity><IconSwitcher componentName='MaterialCommunityIcons' iconName='cancel' color='black' iconsize={3.5} /></TouchableOpacity>
-                    </View>
-                    <View>
-                        <Text style={styles.farePrice}>{farePrice(index)}</Text>
-                    </View>
-                    <TouchableOpacity style={styles.bookingButton}>
-                        <Text style={styles.bookingButtonText}>Book</Text>
-                    </TouchableOpacity>
-                </View>
-                { item.slice(1).length!==0&&<TouchableOpacity style={{ alignItems: 'center',flexDirection:'row',justifyContent:'center',columnGap:responsiveHeight(1) }} onPress={()=>{toggleOpen(index)}}>
-                <Text style={{ color: colors.facebook }} >View All</Text>
-                <IconSwitcher componentName='Feather'iconName={openIndices.includes(index)?"chevron-up":"chevron-down"} color={colors.facebook} iconsize={3}  />
-                </TouchableOpacity>}
-               {openIndices.includes(index)&& <FlatList data={flightsData[index].slice(1)} renderItem={handleEachFlightCard} keyExtractor={(item => item.ResultIndex)} nestedScrollEnabled />}
-            </View>
+        // return (
+        //     <View style={styles.mainContainer}>
+        //         <View style={styles.logoHeader}>
+        //             <View style={styles.flightLogoContainer}>{flightSymbol(item[0].Airline.AirlineName) ? (
+        //                 <Image source={{ uri: flightSymbol(item[0].Airline.AirlineName) }} style={styles.flightLogo} resizeMode='contain' />
+        //             ) : <IconSwitcher componentName='FontAwesome5' iconName='plane-departure' iconsize={3} />}</View>
+        //             <Text style={styles.airlineName}>{`${item[0].Airline.AirlineName}`}</Text>
+        //             <View style={{ width: "60%" }}>
+        //                 <Text style={styles.flightNumbers}>({flightNumbers(item)})</Text>
+        //             </View>
+        //         </View>
+        //         <View style={styles.flightsTimingContainer}>
+        //             <View style={styles.originContainer}>
+        //                 <Text style={styles.flightTimings}>{flightsTimings(item[0]?.Origin?.DepTime)}</Text>
+        //                 <Text style={styles.originTitle}>{originSelectedAirport.iataCode}</Text>
+        //             </View>
+        //             <View style={styles.directionContainer} >
+        //                 <TouchableOpacity style={styles.stopsBtn} onPress={()=>handleVisibility(item)}>
+        //                     <Text style={styles.stopsBtnText}>{item.length > 1 ? `${item.length - 1} ${item.length > 1 ? "Stop" : "Stops"}` : "Direct"}</Text>
+        //                     <IconSwitcher componentName='EvilIcons' iconName='chevron-up' iconsize={3.5} color={colors.highlight} />
+        //                 </TouchableOpacity>
+        //                 <View style={{ borderTopWidth: 1, borderStyle: "dashed" }}></View>
+        //                 <Text style={styles.flighttotalTime}> {totalTimeTravelling(item[0]?.Origin?.DepTime, item[item.length - 1].Destination.ArrTime, item)}</Text>
+        //             </View>
+        //             <View style={styles.destinationContainer}>
+        //                 <Text style={styles.flightTimings}>{flightsTimings(item[item.length - 1].Destination.ArrTime)}</Text>
+        //                 <Text style={styles.destinationTitle}>{destinationSelectedAirPort.iataCode}</Text>
+        //             </View>
+        //             <View>
+        //             </View>
+        //         </View>
+        //         <View style={styles.flightPricesContainer}>
+        //             <View style={styles.luggageBagContainer}>
+        //                 <TouchableOpacity><IconSwitcher componentName='MaterialCommunityIcons' iconName='bag-suitcase-outline' color='black' iconsize={3.5} /></TouchableOpacity>
+        //                 <TouchableOpacity><IconSwitcher componentName='MaterialCommunityIcons' iconName='cancel' color='black' iconsize={3.5} /></TouchableOpacity>
+        //             </View>
+        //             <View>
+        //                 <Text style={styles.farePrice}>{farePrice(index)}</Text>
+        //             </View>
+        //             <TouchableOpacity style={styles.bookingButton}>
+        //                 <Text style={styles.bookingButtonText}>Book</Text>
+        //             </TouchableOpacity>
+        //         </View>
+        //         {/* { item.slice(1).length!==0&&<TouchableOpacity style={{ alignItems: 'center',flexDirection:'row',justifyContent:'center',columnGap:responsiveHeight(1) }} onPress={()=>{toggleOpen(index)}}>
+        //         <Text style={{ color: colors.facebook }} >View All</Text>
+        //         <IconSwitcher componentName='Feather'iconName={openIndices.includes(index)?"chevron-up":"chevron-down"} color={colors.facebook} iconsize={3}  />
+        //         </TouchableOpacity>}
+        //        {openIndices.includes(index)&& <FlatList data={flightsData[index].slice(1)} renderItem={handleEachFlightCard} keyExtractor={(item => item.ResultIndex)} nestedScrollEnabled />} */}
+        //     </View>
 
+        // )
+        return(
+            <View style={{marginBottom:60}}>
+                <FlightCard/>
+            </View>
         )
-    },[])
+    })
     return (
       <View>
-          <FlatList data={singleSigment}  renderItem={({ item,index }) => <HandleRendering item={item} index={index}/>} contentContainerStyle={{ paddingBottom: responsiveHeight(5) }} />
-            <Modal animationType="slide"
+          <FlatList data={singleSigment}  renderItem={({ item,index }) => <HandleRendering item={item} index={index}/>} contentContainerStyle={{ paddingBottom: responsiveHeight(5) }} initialNumToRender={5}
+      maxToRenderPerBatch={5} 
+      windowSize={5} />
+            {/* <Modal animationType="slide"
                 visible={modalVisible}>
                 <View style={styles.modelMainContainer}>
                     <View style={styles.modelSubContainer}>
@@ -809,12 +818,12 @@ const toggleOpen = useCallback((index: number) => {
                         {clicked.length!==0&&flightRoute(clicked)}
                     </View>
                 </View>
-            </Modal> 
+            </Modal>  */}
       </View>
     )
 }
 
-export default FlightDataCard
+export default React.memo(FlightDataCard)
 const styles = StyleSheet.create({
     mainContainer: {
         paddingHorizontal: responsiveWidth(3.5),

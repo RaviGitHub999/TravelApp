@@ -216,7 +216,7 @@ const FlightsRes = (props: any) => {
 
             <View style={styles.activeIndicatorMainContainer}>
                 {flightSearchLoading ? (
-                    <View style={styles.activeIndicator}><ProgressBar /></View>
+                    <View style={styles.activeIndicator}><ProgressBar/></View>
                 ) : flightsData.length === 0 ? (
                     <Text style={styles.nodata}>{translate(en.flightsRes.noData)}</Text>
                 ) : (
@@ -227,4 +227,4 @@ const FlightsRes = (props: any) => {
     );
 };
 
-export default FlightsRes;
+export default React.memo(FlightsRes);

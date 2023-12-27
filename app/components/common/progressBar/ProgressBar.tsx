@@ -46,4 +46,4 @@ fontFamily:fonts.textFont
         rowGap:responsiveHeight(1)
     }
   });
-export default ProgressBar
+export default React.memo(ProgressBar)

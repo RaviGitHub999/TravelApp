@@ -70,11 +70,11 @@ interface InitialState {
     airlinelogos: [],
     status: string,
     error: any,
-    RemainingFlights:any,
-    showFilters:boolean,
-    flightsNamesList:any[],
-    singleSigment:any[],
-    flightLogo:string|null
+    RemainingFlights: any,
+    showFilters: boolean,
+    flightsNamesList: any[],
+    singleSigment: any[],
+    flightLogo: string | null
 }
 const initialState: InitialState = {
     origin: "",
@@ -124,11 +124,11 @@ const initialState: InitialState = {
     airlinelogos: [],
     status: 'idle',
     error: null,
-    RemainingFlights:[],
-    showFilters:false,
-    flightsNamesList:[],
-    singleSigment:[],
-    flightLogo:""
+    RemainingFlights: [],
+    showFilters: false,
+    flightsNamesList: [],
+    singleSigment: [],
+    flightLogo: ""
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -482,22 +482,18 @@ export const flightSearch = createSlice(
             handleJourneyWay: (state, action) => {
                 state.journeyWay = action.payload
             },
-            handleFlightsFilter:(state,action)=>
-            {
-                state.showFilters=action.payload
+            handleFlightsFilter: (state, action) => {
+                state.showFilters = action.payload
             },
-            handleFlightNames:(state)=>
-            {
-                state.singleSigment.flat(1).map((ele)=>
-                {
-                    if(!state.flightsNamesList.includes(ele.Airline.Airline))
-                    {
-state.flightsNamesList.push(ele)
+            handleFlightNames: (state) => {
+                state.singleSigment.flat(1).map((ele) => {
+                    if (!state.flightsNamesList.includes(ele.Airline.Airline)) {
+                        state.flightsNamesList.push(ele)
                     }
                 })
 
             }
-          
+
         },
 
         extraReducers: (builder) => {
@@ -531,8 +527,10 @@ state.flightsNamesList.push(ele)
             builder.addCase(flightSearching.fulfilled, (state, action) => {
                 state.flightsData = action.payload.flightResult.Response.Results.flat(1)
                 state.flightSearchLoading = false
-                state.singleSigment=state.flightsData.map((ele)=>ele[0].Segments.flat(1))
-                // console.log(state.flightsData.map((ele)=>ele.Segments.flat(1)))
+                state.singleSigment = state.flightsData.map((ele) => ele[0].Segments.flat(1))
+                state.flightsNamesList = Array.from(new Set(state.singleSigment.flat(1).map(ele => ele.Airline.AirlineName))
+
+                )
             });
 
             builder.addCase(flightSearching.pending, (state) => {
@@ -567,7 +565,7 @@ export const selectOriginWithDebounce = (query: string) => (dispatch: any, getSt
 export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
     debouncedSearchDestinationAirport(dispatch, getState, query)
 }
-export const {handleFlightNames,handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
+export const { handleFlightNames, handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
 export default flightSearch.reducer
 
 

@@ -1,31 +1,35 @@
 import React, { useState } from 'react'; 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'; 
 import { responsiveHeight } from '../../../utils/responsiveScale';
+import { colors, fonts } from '../../../config/theme';
 interface IProps{
     label?:string,
     selected:boolean,
     onSelect:()=>void
 }
 const CustomRadioButton:React.FC<IProps>= ({ label, selected, onSelect }) => ( 
-    <TouchableOpacity 
+    <View style={styles.container}>
+        <TouchableOpacity 
         style={[styles.radioButton,selected&&{borderColor: '#007BFF'  }]} 
         onPress={onSelect} 
     > 
-    <View style={[styles.innerCircle,selected&&{ backgroundColor: '#007BFF'  }]}/>
+    <View style={[styles.innerCircle,selected&&{ backgroundColor: '#007BFF', borderRadius:responsiveHeight(3)  }]}/>
+    
     </TouchableOpacity> 
+    <Text style={styles.label}>{label}</Text>
+    </View>
+    
 ); 
   
 const styles = StyleSheet.create({ 
-    container: { 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        backgroundColor: '#F5F5F5', 
-    }, 
+    container: {
+        flexDirection:'row',
+        columnGap:responsiveHeight(1)
+    },
     innerCircle:{
         height:responsiveHeight(1),
         width:responsiveHeight(1),
-        borderRadius:responsiveHeight(2)
+       
     },
     radioButton: { 
         borderWidth: responsiveHeight(0.2), 
@@ -39,5 +43,10 @@ const styles = StyleSheet.create({
     radioButtonText: { 
         fontSize: 16, 
     }, 
+    label:{
+        fontSize:responsiveHeight(2),
+        fontFamily:fonts.primary,
+        color:colors.black
+    }
 }); 
   export default CustomRadioButton
