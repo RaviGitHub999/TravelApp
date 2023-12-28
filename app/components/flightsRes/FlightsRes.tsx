@@ -162,6 +162,7 @@ import { handleFlightsFilter } from '../../redux/reducers/flightSearch';
 import { responsiveHeight } from '../../utils/responsiveScale';
 
 const FlightsRes = (props: any) => {
+    console.log("res")
     const dispatch: AppDispatch = useDispatch();
     const {
         flightsData,
@@ -175,6 +176,7 @@ const FlightsRes = (props: any) => {
         infants,
         returnformattedDate,
         classes,
+    
     } = useSelector((state: RootState) => state.flightReducer);
 
     const travellers = adults + children + infants;
@@ -220,7 +222,7 @@ const FlightsRes = (props: any) => {
                 ) : flightsData.length === 0 ? (
                     <Text style={styles.nodata}>{translate(en.flightsRes.noData)}</Text>
                 ) : (
-                    <FlightDataCard />
+                   !showFilters && <FlightDataCard />
                 )}
             </View>
         </View>

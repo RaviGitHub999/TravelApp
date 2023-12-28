@@ -615,10 +615,11 @@ interface LogosData {
     url: string
 }[]
 const FlightDataCard = () => {
+    console.log("l")
     const [modalVisible, setModalVisible] = useState(false);
     const [clicked, setClicked] = useState([]);
     const [openIndices, setOpenIndices] = useState<number[]>([]);
-    const { singleSigment, airlinelogos, originSelectedAirport, destinationSelectedAirPort, flightsData } = useSelector((state: RootState) => state.flightReducer)
+    const { singleSigment, airlinelogos,filteredFlightsData, originSelectedAirport, destinationSelectedAirPort, flightsData } = useSelector((state: RootState) => state.flightReducer)
     const dispatch: AppDispatch = useDispatch()
     const flightSymbol = useCallback((airlineName: string): string | undefined => {
         const logo: LogosData | undefined = airlinelogos.find(ele => ele.id === airlineName?.toLowerCase());
@@ -800,14 +801,14 @@ const toggleOpen = useCallback((index: number) => {
 
         // )
         return(
-            <View style={{marginBottom:60}}>
-                <FlightCard/>
+            <View >
+                <FlightCard item={item}/>
             </View>
         )
     })
     return (
       <View>
-          <FlatList data={singleSigment}  renderItem={({ item,index }) => <HandleRendering item={item} index={index}/>} contentContainerStyle={{ paddingBottom: responsiveHeight(5) }} initialNumToRender={5}
+          <FlatList data={flightsData}  renderItem={({ item,index }) => <HandleRendering item={item} index={index}/>} contentContainerStyle={{ paddingBottom: responsiveHeight(5) }} initialNumToRender={5}
       maxToRenderPerBatch={5} 
       windowSize={5} />
             {/* <Modal animationType="slide"

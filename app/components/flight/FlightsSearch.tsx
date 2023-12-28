@@ -109,7 +109,7 @@ const FlightsSearch:React.FC<IProps> = ({navigation:{navigate}}) => {
               <View >
                 {airportOriginLoading ? (
                   <Text>Loading......</Text>
-                ) : airportOriginData.length === 0 ?
+                ) : airportOriginData?.length === 0 ?
                   <Text>No Data!!!</Text> : <View style={{ flex: 1 }}>
                     <FlatList data={airportOriginData} renderItem={({ item }:any) => <MemoizedAirportItem {...item} />} nestedScrollEnabled style={styles.airportOriginDataContainer} />
                   </View>}

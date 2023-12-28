@@ -66,6 +66,10 @@ interface InitialState {
     departureformattedDate: string,
     returnformattedDate: string,
     flightsData: any[],
+    flightSearchToken:string
+    flightSessionStarted:boolean,
+    flightSessionExpired:boolean,
+    internationalFlights:boolean,
     flightSearchLoading: boolean,
     airlinelogos: [],
     status: string,
@@ -74,7 +78,11 @@ interface InitialState {
     showFilters: boolean,
     flightsNamesList: any[],
     singleSigment: any[],
-    flightLogo: string | null
+    flightLogo: string | null, 
+    filters:{
+        selectFlightName: string | null
+    },
+    filteredFlightsData:any[]
 }
 const initialState: InitialState = {
     origin: "",
@@ -120,6 +128,10 @@ const initialState: InitialState = {
     departureformattedDate: "",
     returnformattedDate: "",
     flightsData: [],
+    flightSearchToken:"",
+    flightSessionStarted:false,
+    flightSessionExpired:false,
+    internationalFlights:false,
     flightSearchLoading: false,
     airlinelogos: [],
     status: 'idle',
@@ -128,7 +140,11 @@ const initialState: InitialState = {
     showFilters: false,
     flightsNamesList: [],
     singleSigment: [],
-    flightLogo: ""
+    flightLogo: "",
+    filters:{
+        selectFlightName: null
+    },
+    filteredFlightsData:[]
 }
 type DebounceFunction = (cb: Function, delay: number) => (...args: any[]) => void;
 
@@ -330,6 +346,7 @@ export const flightSearching = createAsyncThunk("fetching Flights Data", async (
         data,
     );
     if (response) {
+        console.log(response,"response")
         return fulfillWithValue(response)
     }
     else {
@@ -492,9 +509,48 @@ export const flightSearch = createSlice(
                     }
                 })
 
-            }
+            },
+            handleSelectFlightName: (state, action) => {
+                if (state.filters.selectFlightName?.includes(action.payload)) {
+                    state.filters.selectFlightName = null
+                }
+                else {
+                    state.filters.selectFlightName = action.payload
+                }
+            },
+            // applyFilters: (state) => {
+            //     const { selectFlightName } = state.filters;
+              
+            //     state.singleSigment = state.sum.filter(item => {
+            //       if (selectFlightName && item[0].Airline.AirlineName !== selectFlightName) {
+            //         return false; // Exclude items with mismatched names
+            //       }
+            //     //   if (maxAge && item.age >= maxAge) {
+            //     //     return false; // Exclude items with ages greater than or equal to maxAge
+            //     //   }
+            //     //   if (gender && item.gender !== gender) {
+            //     //     return false; // Exclude items with mismatched genders
+            //     //   }
+            //       return true; // Include items that meet all filter criteria
+            //     });
+            //   }
+            applyFilters: (state) => {
+                const { selectFlightName } = state.filters;
+              
+                // Check if selectFlightName is defined
+                if (selectFlightName) {
+                  // Filter state.flightsData based on selectFlightName
+                  state.filteredFlightsData = state.singleSigment.filter(item => item[0]?.Airline?.AirlineName === selectFlightName);
+                } else {
+                  // If selectFlightName is not defined, reset filteredFlightsData to the original state.flightsData
+                  state.filteredFlightsData = [...state.singleSigment];
+                }
+              }
+              
+              
 
         },
+        
 
         extraReducers: (builder) => {
             builder.addCase(searchOriginAirport.fulfilled, (state, action) => {
@@ -526,11 +582,17 @@ export const flightSearch = createSlice(
 
             builder.addCase(flightSearching.fulfilled, (state, action) => {
                 state.flightsData = action.payload.flightResult.Response.Results.flat(1)
+               state.flightSearchToken=action.payload.flightResult.tokenId
                 state.flightSearchLoading = false
+                state.flightSessionStarted= true
+                setTimeout(() => {
+                    state.flightSessionStarted=false,
+                    state.flightSessionExpired= true
+                }, 840000);
+                state.internationalFlights= action.payload.flightResult.Response.Results.length > 1 ? false : true
                 state.singleSigment = state.flightsData.map((ele) => ele[0].Segments.flat(1))
-                state.flightsNamesList = Array.from(new Set(state.singleSigment.flat(1).map(ele => ele.Airline.AirlineName))
-
-                )
+                state.filteredFlightsData=state.singleSigment
+                state.flightsNamesList = Array.from(new Set(state.singleSigment.flat(1).map(ele => ele.Airline.AirlineName)))
             });
 
             builder.addCase(flightSearching.pending, (state) => {
@@ -565,7 +627,7 @@ export const selectOriginWithDebounce = (query: string) => (dispatch: any, getSt
 export const selectDestinationWithDebounce = (query: string) => (dispatch: Function, getState: Function) => {
     debouncedSearchDestinationAirport(dispatch, getState, query)
 }
-export const { handleFlightNames, handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
+export const { handleSelectFlightName, applyFilters,handleFlightNames, handleClass, handleFlightsFilter, handleDropDownState, handleDepartureDateChange, handleReturnDateChange, handleDestinationSelectedAirPort, handleChangeOriginTextInput, handleOriginSelectedAirPort, handleChangeDestinationTextInput, handleJourneyWay } = flightSearch.actions
 export default flightSearch.reducer
 
 

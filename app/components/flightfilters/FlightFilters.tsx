@@ -4,7 +4,7 @@ import IconSwitcher from '../common/icons/IconSwitcher'
 import { colors } from '../../config/theme'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../redux/store'
-import { handleFlightNames, handleFlightsFilter } from '../../redux/reducers/flightSearch'
+import { applyFilters, handleFlightNames, handleFlightsFilter, handleSelectFlightName } from '../../redux/reducers/flightSearch'
 import { styles } from './styles'
 import en from '../../config/locales/en'
 import { translate } from '../../config/i18n'
@@ -33,11 +33,12 @@ const sunImg = [
 ]
 
 const FlightFilters = () => {
+  console.log("filterComponent")
   const dispatch: AppDispatch = useDispatch()
   const [times, setTimes] = useState(sunImg);
-  const [selectFlightName, setFlightName] = useState<string>("")
+  // const [selectFlightName, setFlightName] = useState<string>("")
   const [selectedStops, setSelectedStops] = useState<number | null>(null);
-  const { singleSigment, flightsNamesList } = useSelector((state: RootState) => state.flightReducer)
+  const { singleSigment, flightsNamesList,filters } = useSelector((state: RootState) => state.flightReducer)
   const toggleSelection = (index: number) => {
     const updatedTimes = [...times];
     updatedTimes[index].clicked = !updatedTimes[index].clicked;
@@ -51,19 +52,20 @@ const FlightFilters = () => {
       </TouchableOpacity>
     )
   })
-  const handleFlightName = (item: string) => {
-    if (selectFlightName.includes(item)) {
-      setFlightName("")
-    }
-    else {
-      setFlightName(item)
-    }
+  // const handleFlightName = (item: string) => {
+  //   if (selectFlightName.includes(item)) {
+  //     setFlightName("")
+  //   }
+  //   else {
+  //     setFlightName(item)
+  //   }
 
-  }
+  // }
+  // console.log(selectFlightName)
   const handleFlightsNames = ({ item }: { item: string }) => {
     return (
-      <TouchableOpacity style={[styles.flightNameBtn, selectFlightName === item && styles.selectedFlightNameBtn]} onPress={() => handleFlightName(item)}>
-        <Text style={[styles.flightName, selectFlightName === item && styles.selectedFlightName]}>{item}</Text>
+      <TouchableOpacity style={[styles.flightNameBtn, filters.selectFlightName === item && styles.selectedFlightNameBtn]} onPress={() => dispatch(handleSelectFlightName(item))}>
+        <Text style={[styles.flightName, filters.selectFlightName === item && styles.selectedFlightName]}>{item}</Text>
       </TouchableOpacity>
     )
   }
@@ -126,6 +128,9 @@ else{
       </View>
       <TouchableOpacity style={styles.upArrowIcon} onPress={() => dispatch(handleFlightsFilter(false))}>
         <IconSwitcher componentName='Ionicons' iconName='chevron-up' color={colors.black} iconsize={3.5} />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>dispatch(applyFilters())}>
+        <Text>Apply</Text>
       </TouchableOpacity>
     </ScrollView>
   )
