@@ -38,7 +38,7 @@ const FlightFilters = () => {
   const [times, setTimes] = useState(sunImg);
   // const [selectFlightName, setFlightName] = useState<string>("")
   const [selectedStops, setSelectedStops] = useState<number | null>(null);
-  const { singleSigment, flightsNamesList,filters } = useSelector((state: RootState) => state.flightReducer)
+  // const { singleSigment, flightsNamesList,filters } = useSelector((state: RootState) => state.flightReducer)
   const toggleSelection = (index: number) => {
     const updatedTimes = [...times];
     updatedTimes[index].clicked = !updatedTimes[index].clicked;
@@ -62,13 +62,13 @@ const FlightFilters = () => {
 
   // }
   // console.log(selectFlightName)
-  const handleFlightsNames = ({ item }: { item: string }) => {
-    return (
-      <TouchableOpacity style={[styles.flightNameBtn, filters.selectFlightName === item && styles.selectedFlightNameBtn]} onPress={() => dispatch(handleSelectFlightName(item))}>
-        <Text style={[styles.flightName, filters.selectFlightName === item && styles.selectedFlightName]}>{item}</Text>
-      </TouchableOpacity>
-    )
-  }
+  // const handleFlightsNames = ({ item }: { item: string }) => {
+  //   return (
+  //     <TouchableOpacity style={[styles.flightNameBtn, filters.selectFlightName === item && styles.selectedFlightNameBtn]} onPress={() => dispatch(handleSelectFlightName(item))}>
+  //       <Text style={[styles.flightName, filters.selectFlightName === item && styles.selectedFlightName]}>{item}</Text>
+  //     </TouchableOpacity>
+  //   )
+  // }
   const handleFlightStops=(item:number)=>
   {
 if(item===selectedStops)
@@ -88,7 +88,7 @@ else{
       <View style={styles.filtersmainContainer}>
         <View>
           <Text style={styles.filterTitles}>{translate(en.flightsRes.airline)}</Text>
-          <FlatList data={flightsNamesList} renderItem={handleFlightsNames} numColumns={4} style={styles.flightNamesRenderContainer} nestedScrollEnabled />
+          {/* <FlatList data={flightsNamesList} renderItem={handleFlightsNames} numColumns={4} style={styles.flightNamesRenderContainer} nestedScrollEnabled /> */}
         </View>
         <View>
           <Text style={styles.filterTitles}>{translate(en.flightsRes.stops)}</Text>

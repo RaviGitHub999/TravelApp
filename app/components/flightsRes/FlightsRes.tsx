@@ -176,7 +176,7 @@ const FlightsRes = (props: any) => {
         infants,
         returnformattedDate,
         classes,
-    
+        flightResJType
     } = useSelector((state: RootState) => state.flightReducer);
 
     const travellers = adults + children + infants;
@@ -222,7 +222,7 @@ const FlightsRes = (props: any) => {
                 ) : flightsData.length === 0 ? (
                     <Text style={styles.nodata}>{translate(en.flightsRes.noData)}</Text>
                 ) : (
-                   !showFilters && <FlightDataCard />
+                   !showFilters && flightResJType===0?<FlightDataCard index={0}/>:<FlightDataCard index={1}/>
                 )}
             </View>
         </View>
